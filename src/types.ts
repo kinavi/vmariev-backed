@@ -7,6 +7,7 @@ import {
   ReviewsController,
   UsersController,
 } from './controllers';
+import { TasksController } from './controllers/TasksController';
 
 export type FastifyType = FastifyInstance & {
   controls: {
@@ -15,6 +16,7 @@ export type FastifyType = FastifyInstance & {
     reviews: ReviewsController;
     files: FilesController;
     orders: OrdersController;
+    tasks: TasksController;
   };
   io: typeof socketioServer;
 };

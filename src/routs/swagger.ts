@@ -148,5 +148,18 @@ export const swaggerPlugin: any = async (
       updatedAt: { type: 'string' },
     },
   });
+  fastify.addSchema({
+    $id: 'Task',
+    type: 'object',
+    required: ['id', 'name', 'userId'],
+    properties: {
+      id: { type: 'number' },
+      name: { type: 'string' },
+      description: { type: 'string' },
+      userId: { type: 'number' },
+      createdAt: { type: 'string' },
+      updatedAt: { type: 'string' },
+    },
+  });
   fastify.register(routs, { prefix: '/api', logLevel: 'debug' });
 };

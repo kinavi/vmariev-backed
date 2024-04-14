@@ -3,6 +3,7 @@ import Order from './order';
 import Review from './review';
 import User from './user';
 import File from './file';
+import Task from './task';
 
 Order.belongsTo(User, {
   as: 'customer',
@@ -68,4 +69,22 @@ User.hasMany(File, {
   foreignKeyConstraint: true,
 });
 
-export { Offer, Order, Review, User, File };
+User.hasMany(Task, {
+  as: 'task',
+  foreignKey: {
+    name: 'userId',
+    allowNull: true,
+  },
+  foreignKeyConstraint: true,
+});
+
+Task.belongsTo(User, {
+  as: 'task',
+  foreignKey: {
+    name: 'userId',
+    allowNull: false,
+  },
+  foreignKeyConstraint: true,
+});
+
+export { Offer, Order, Review, User, File, Task };

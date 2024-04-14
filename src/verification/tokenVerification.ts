@@ -9,6 +9,9 @@ export const tokenVerification = (fastify: FastifyType) => {
       const token = (authorization as any).replace(/Bearer\s*/gi, '');
       const user = await fastify.controls.users.checkToken(token);
       console.log('user', user);
+      if (!user) {
+        throw new Error(NO_ACCESS_CODE_ERROR);
+      }
       request.user = user;
     } catch (error) {
       throw new Error(NO_ACCESS_CODE_ERROR);

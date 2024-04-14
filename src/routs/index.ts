@@ -4,6 +4,7 @@ import { offerRoutes } from './offers';
 import { NO_ACCESS_CODE_ERROR } from '../constants';
 import { adminRouts } from './admin';
 import { privateRouts } from './private';
+import { managerRouts } from './manager';
 
 export const routs: FastifyPluginCallback = async (
   fastify,
@@ -20,5 +21,6 @@ export const routs: FastifyPluginCallback = async (
   fastify.register(offerRoutes, { prefix: '/offers' });
   fastify.register(authRoutes, { prefix: '/auth' });
   fastify.register(adminRouts, { prefix: '/admin' });
+  fastify.register(managerRouts, { prefix: '/manager' });
   fastify.register(privateRouts);
 };

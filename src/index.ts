@@ -14,6 +14,7 @@ import {
   UsersController,
 } from './controllers';
 import { swaggerPlugin } from './routs/swagger';
+import { TasksController } from './controllers/TasksController';
 
 export const upload = multer({ dest: 'uploads/' });
 
@@ -53,6 +54,7 @@ export class Server {
       offers: new OffersController(),
       reviews: new ReviewsController(),
       files: new FilesController(),
+      tasks: new TasksController(),
     });
     this.fastify.register(swaggerPlugin);
     this.fastify.register(middie);

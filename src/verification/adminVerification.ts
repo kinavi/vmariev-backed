@@ -11,6 +11,9 @@ export const adminVerification = (fastify: FastifyType) => {
       }
       const token = (authorization as any).replace(/Bearer\s*/gi, '');
       const user = await fastify.controls.users.checkToken(token);
+      if (!user) {
+        throw new Error(NO_ACCESS_CODE_ERROR);
+      }
       request.user = user;
       if (user?.role !== UserRole.owner) {
         throw new Error(NO_ACCESS_CODE_ERROR);

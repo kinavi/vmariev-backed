@@ -3,7 +3,7 @@ import { FastifyType, ResponceType } from '../../../types';
 declare module 'fastify' {
   interface FastifyRequest {
     // you must reference the interface and not the type
-    user: IUserAttributes | undefined;
+    user: IUserAttributes;
   }
 }
 
