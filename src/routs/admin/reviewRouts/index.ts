@@ -1,4 +1,4 @@
-import { ErrorType, FastifyType, ResponceType } from '../../../types';
+import { FastifyType, ResponceType } from '../../../types';
 
 export const reviewRouts: any = (
   fastify: FastifyType,

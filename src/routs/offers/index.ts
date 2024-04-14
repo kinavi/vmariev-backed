@@ -1,4 +1,4 @@
-import { ErrorType, FastifyType, ResponceType } from '../../types';
+import { ResponseErrorType, FastifyType, ResponceType } from '../../types';
 import isAfter from 'date-fns/isAfter';
 
 interface ICreateOfferBody {
@@ -54,7 +54,7 @@ export const offerRoutes: any = async (
       const offer = await fastify.controls.offers.get(email);
       switch (true) {
         case !!user: {
-          const error: ErrorType = {
+          const error: ResponseErrorType = {
             status: 'error',
             field: 'email',
             message: 'Email is busy',
@@ -122,7 +122,7 @@ export const offerRoutes: any = async (
       const offer = await fastify.controls.offers.get(email);
       switch (true) {
         case !offer: {
-          const error: ResponceType & ErrorType = {
+          const error: ResponceType & ResponseErrorType = {
             status: 'error',
             field: 'email',
             message: 'not has offer by email',
@@ -131,7 +131,7 @@ export const offerRoutes: any = async (
           break;
         }
         case offer?.code !== code: {
-          const error: ResponceType & ErrorType = {
+          const error: ResponceType & ResponseErrorType = {
             status: 'error',
             field: 'code',
             message: 'code is not valid',
@@ -140,7 +140,7 @@ export const offerRoutes: any = async (
           break;
         }
         case !!offer && !isAfter(new Date(offer.lifeDate), new Date()): {
-          const error: ResponceType & ErrorType = {
+          const error: ResponceType & ResponseErrorType = {
             status: 'error',
             field: 'code',
             message: 'invitation expired',
@@ -149,7 +149,7 @@ export const offerRoutes: any = async (
           break;
         }
         case !!offer?.isConfirm: {
-          const error: ResponceType & ErrorType = {
+          const error: ResponceType & ResponseErrorType = {
             status: 'error',
             field: 'code',
             message: 'code has confirm',

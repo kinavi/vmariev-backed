@@ -1,4 +1,4 @@
-import { Task } from '../../database/models';
+import { Task, Track } from '../../database/models';
 import { ICreateTaskData } from './types';
 
 export class TasksController {
@@ -14,6 +14,24 @@ export class TasksController {
   getAll = async () => {
     const offer = await Task.findAll();
     return offer?.map((item) => item.toJSON());
+  };
+
+  getAllRunning = async (userId: number) => {
+    const result = await Task.findAll({
+      where: {
+        userId,
+      },
+      include: [
+        {
+          model: Track,
+          as: 'tracks',
+          where: {
+            dateStop: null,
+          },
+        },
+      ],
+    });
+    return result.map((item) => item.toJSON());
   };
 
   create = async (data: ICreateTaskData) => {

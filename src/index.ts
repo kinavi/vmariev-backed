@@ -15,6 +15,8 @@ import {
 } from './controllers';
 import { swaggerPlugin } from './routs/swagger';
 import { TasksController } from './controllers/TasksController';
+import { TracksControler } from './controllers/TracksControler';
+import { FastifyType } from './types';
 
 export const upload = multer({ dest: 'uploads/' });
 
@@ -55,7 +57,8 @@ export class Server {
       reviews: new ReviewsController(),
       files: new FilesController(),
       tasks: new TasksController(),
-    });
+      tracks: new TracksControler(),
+    } as FastifyType['controls']);
     this.fastify.register(swaggerPlugin);
     this.fastify.register(middie);
     this.fastify.register(require('@fastify/static'), {

@@ -8,6 +8,7 @@ import {
   UsersController,
 } from './controllers';
 import { TasksController } from './controllers/TasksController';
+import { TracksControler } from './controllers/TracksControler';
 
 export type FastifyType = FastifyInstance & {
   controls: {
@@ -17,11 +18,12 @@ export type FastifyType = FastifyInstance & {
     files: FilesController;
     orders: OrdersController;
     tasks: TasksController;
+    tracks: TracksControler;
   };
   io: typeof socketioServer;
 };
 
-export type ErrorType = {
+export type ResponseErrorType = {
   status: 'error';
   field?: string;
   message: string;

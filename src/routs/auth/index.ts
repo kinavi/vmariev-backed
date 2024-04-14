@@ -1,5 +1,5 @@
 import {
-  ErrorType,
+  ResponseErrorType,
   FastifyType,
   ResponceType,
   UserRole,
@@ -73,7 +73,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
       const offer = await fastify.controls.offers.get(email);
       switch (true) {
         case !offer || !offer.isConfirm: {
-          const error: ResponceType & ErrorType = {
+          const error: ResponceType & ResponseErrorType = {
             status: 'error',
             field: 'email',
             message: 'not has offer or offer not confirm',
@@ -82,7 +82,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           break;
         }
         case !!user: {
-          const error: ResponceType & ErrorType = {
+          const error: ResponceType & ResponseErrorType = {
             status: 'error',
             field: 'email',
             message: 'email is busy',
@@ -96,7 +96,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
             login,
             password,
             phone,
-            role,
+            role: UserRole.client,
           });
           const result = await fastify.controls.users.createToken(
             email,

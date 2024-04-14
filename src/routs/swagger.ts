@@ -159,6 +159,20 @@ export const swaggerPlugin: any = async (
       userId: { type: 'number' },
       createdAt: { type: 'string' },
       updatedAt: { type: 'string' },
+      tracks: {
+        type: 'array',
+        items: { $ref: 'Track' },
+      },
+    },
+  });
+  fastify.addSchema({
+    $id: 'Track',
+    type: 'object',
+    required: ['id', 'dateStart'],
+    properties: {
+      id: { type: 'number' },
+      dateStart: { type: 'string' },
+      dateStop: { type: 'string', nullable: true },
     },
   });
   fastify.register(routs, { prefix: '/api', logLevel: 'debug' });

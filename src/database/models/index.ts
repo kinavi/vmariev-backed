@@ -4,6 +4,7 @@ import Review from './review';
 import User from './user';
 import File from './file';
 import Task from './task';
+import Track from './track';
 
 Order.belongsTo(User, {
   as: 'customer',
@@ -70,7 +71,7 @@ User.hasMany(File, {
 });
 
 User.hasMany(Task, {
-  as: 'task',
+  as: 'tasks',
   foreignKey: {
     name: 'userId',
     allowNull: true,
@@ -87,4 +88,22 @@ Task.belongsTo(User, {
   foreignKeyConstraint: true,
 });
 
-export { Offer, Order, Review, User, File, Task };
+Task.hasMany(Track, {
+  as: 'tracks',
+  foreignKey: {
+    name: 'taskId',
+    allowNull: false,
+  },
+  foreignKeyConstraint: true,
+});
+
+Track.belongsTo(Task, {
+  as: 'track',
+  foreignKey: {
+    name: 'taskId',
+    allowNull: false,
+  },
+  foreignKeyConstraint: true,
+});
+
+export { Offer, Order, Review, User, File, Task, Track };
