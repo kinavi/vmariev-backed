@@ -2,7 +2,20 @@ import Fastify from 'fastify';
 import middie from 'middie';
 import { routs } from './routs';
 import path from 'path';
+import multer from 'fastify-multer';
 import { readFileSync } from 'fs';
+import cors from '@fastify/cors';
+import ioSocket from 'fastify-socket.io';
+import {
+  FilesController,
+  OffersController,
+  OrdersController,
+  ReviewsController,
+  UsersController,
+} from './controllers';
+import { swaggerPlugin } from './routs/swagger';
+
+export const upload = multer({ dest: 'uploads/' });
 
 const envToLogger = {
   development: {
@@ -21,9 +34,9 @@ const envToLogger = {
 require('dotenv').config();
 
 export class Server {
-  private fastify: ReturnType<typeof Fastify>;
-
   private port;
+
+  fastify: ReturnType<typeof Fastify>;
 
   constructor(port: number) {
     this.port = port;
@@ -34,8 +47,15 @@ export class Server {
         cert: readFileSync(path.join(__dirname, '..', 'https', 'fastify.cert')),
       },
     });
+    this.fastify.decorate('controls', {
+      orders: new OrdersController(),
+      users: new UsersController(),
+      offers: new OffersController(),
+      reviews: new ReviewsController(),
+      files: new FilesController(),
+    });
+    this.fastify.register(swaggerPlugin);
     this.fastify.register(middie);
-    this.fastify.register(routs, { prefix: '/api', logLevel: 'debug' });
     this.fastify.register(require('@fastify/static'), {
       root: path.join(__dirname, '..', 'dist', 'storybook'),
       prefix: '/storybook',
@@ -48,10 +68,25 @@ export class Server {
     this.fastify.setNotFoundHandler((req, res: any) => {
       res.sendFile('index.html');
     });
+    this.fastify.register(ioSocket, {
+      cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+      },
+    });
+    this.fastify.register(cors, {
+      origin: '*',
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    });
+    this.fastify.ready((error) => {
+      this.fastify.io.on('connection', (socket) =>
+        console.info('Socket connected!', socket.id)
+      );
+    });
   }
   run() {
     this.fastify.listen(
-      { port: 443, host: '0.0.0.0' },
+      { port: this.port, host: process.env.HOST },
       function (err, address) {
         console.log('address', address);
         if (err) {
@@ -63,4 +98,5 @@ export class Server {
   }
 }
 
-new Server(process.env.PORT ? Number(process.env.PORT) : 5000).run();
+export const server = new Server(Number(process.env.PORT));
+server.run();

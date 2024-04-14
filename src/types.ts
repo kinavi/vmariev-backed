@@ -1,10 +1,20 @@
 import { FastifyInstance } from 'fastify';
 import { socketioServer } from 'fastify-socket.io';
+import {
+  FilesController,
+  OffersController,
+  OrdersController,
+  ReviewsController,
+  UsersController,
+} from './controllers';
 
 export type FastifyType = FastifyInstance & {
   controls: {
-    // targetController: TargetController;
-    // orderController: OrderController;
+    users: UsersController;
+    offers: OffersController;
+    reviews: ReviewsController;
+    files: FilesController;
+    orders: OrdersController;
   };
   io: typeof socketioServer;
 };
@@ -20,12 +30,8 @@ export type ResponceType = {
   status: 'ok' | 'error';
 };
 
-export type DataResponceType<T> = {
-  data?: T;
-};
-
-export interface IDBDefaultData {
-  id: string;
-  createdAt: string;
-  updatedAt: string;
+export enum UserRole {
+  executor = 'executor',
+  client = 'client',
+  owner = 'owner',
 }
