@@ -5,6 +5,7 @@ import User from './user';
 import File from './file';
 import Task from './task';
 import Track from './track';
+import UserRefreshToken from './userRefreshToken';
 
 Order.belongsTo(User, {
   as: 'customer',
@@ -106,4 +107,13 @@ Track.belongsTo(Task, {
   foreignKeyConstraint: true,
 });
 
-export { Offer, Order, Review, User, File, Task, Track };
+UserRefreshToken.belongsTo(User, {
+  as: 'user',
+  foreignKey: {
+    name: 'userId',
+    allowNull: false,
+  },
+  foreignKeyConstraint: true,
+});
+
+export { Offer, Order, Review, User, File, Task, Track, UserRefreshToken };

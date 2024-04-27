@@ -45,10 +45,10 @@ export class Server {
     this.port = port;
     this.fastify = Fastify({
       logger: envToLogger.development ?? true,
-      https: {
-        key: readFileSync(path.join(__dirname, '..', 'https', 'fastify.key')),
-        cert: readFileSync(path.join(__dirname, '..', 'https', 'fastify.cert')),
-      },
+      // https: {
+      //   key: readFileSync(path.join(__dirname, '..', 'https', 'fastify.key')),
+      //   cert: readFileSync(path.join(__dirname, '..', 'https', 'fastify.cert')),
+      // },
     });
     this.fastify.decorate('controls', {
       orders: new OrdersController(),

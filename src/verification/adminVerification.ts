@@ -10,7 +10,7 @@ export const adminVerification = (fastify: FastifyType) => {
         throw new Error(NO_ACCESS_CODE_ERROR);
       }
       const token = (authorization as any).replace(/Bearer\s*/gi, '');
-      const user = await fastify.controls.users.checkToken(token);
+      const user = await fastify.controls.users.checkAccessToken(token);
       if (!user) {
         throw new Error(NO_ACCESS_CODE_ERROR);
       }

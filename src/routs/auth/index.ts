@@ -1,3 +1,4 @@
+import { NO_ACCESS_CODE_ERROR } from '../../constants';
 import {
   ResponseErrorType,
   FastifyType,
@@ -47,7 +48,8 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
               data: {
                 type: 'object',
                 properties: {
-                  token: { type: 'string' },
+                  access_token: { type: 'string' },
+                  refresh_token: { type: 'string' },
                   user: {
                     $ref: 'User',
                   },
@@ -131,7 +133,8 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
               data: {
                 type: 'object',
                 properties: {
-                  token: { type: 'string' },
+                  access_token: { type: 'string' },
+                  refresh_token: { type: 'string' },
                   user: {
                     $ref: 'User',
                   },
@@ -157,6 +160,85 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
         const result = await fastify.controls.users.createToken(
           email,
           password
+        );
+        const responce = {
+          status: 'ok',
+          data: result,
+        };
+        reply.send(responce);
+      } catch (error) {
+        if ((error as any).status === 'error') {
+          reply.code(403).send(error);
+        }
+        throw error;
+      }
+    }
+  );
+
+  fastify.post<{ Body: { refresh_token: string; client_id: string } }>(
+    '/refreshToken',
+    {
+      schema: {
+        body: {
+          type: 'object',
+          properties: {
+            refresh_token: { type: 'string' },
+            client_id: { type: 'string' },
+          },
+          required: ['refresh_token', 'device_id'],
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['ok', 'error'] },
+              data: {
+                type: 'object',
+                properties: {
+                  access_token: { type: 'string' },
+                  refresh_token: { type: 'string' },
+                  user: {
+                    $ref: 'User',
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['ok', 'error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status', 'field', 'message'],
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      try {
+        const { client_id, refresh_token } = request.body;
+
+        const isValid = await fastify.controls.users.checkRefreshToken(
+          refresh_token,
+          client_id
+        );
+        if (!isValid) {
+          throw new Error(NO_ACCESS_CODE_ERROR);
+        }
+
+        const data = await fastify.controls.users.getRefreshTokenPayload(
+          refresh_token
+        );
+
+        if (!data) {
+          throw new Error(NO_ACCESS_CODE_ERROR);
+        }
+
+        const result = await fastify.controls.users.createToken(
+          request.user.email,
+          data.password
         );
         const responce = {
           status: 'ok',
