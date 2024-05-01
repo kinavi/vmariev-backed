@@ -16,10 +16,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER,
       },
-      clientId: {
-        allowNull: false,
-        type: Sequelize.STRING,
-      },
       refreshToken: {
         allowNull: false,
         type: Sequelize.STRING,

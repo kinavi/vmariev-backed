@@ -54,8 +54,10 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
                     $ref: 'User',
                   },
                 },
+                required: ['access_token', 'refresh_token', 'user'],
               },
             },
+            required: ['status', 'data'],
           },
           400: {
             type: 'object',
@@ -64,51 +66,59 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
     },
     async (request, reply) => {
-      const { email, login, password, phone, role } = request.body;
-      const user = await fastify.controls.users.getUserByEmail(email);
-      const offer = await fastify.controls.offers.get(email);
-      switch (true) {
-        case !offer || !offer.isConfirm: {
-          const error: ResponceType & ResponseErrorType = {
-            status: 'error',
-            field: 'email',
-            message: 'not has offer or offer not confirm',
-          };
-          reply.code(400).send(error);
-          break;
+      try {
+        const { email, login, password, phone, role } = request.body;
+        const user = await fastify.controls.users.getUserByEmail(email);
+        const offer = await fastify.controls.offers.get(email);
+        switch (true) {
+          case !offer || !offer.isConfirm: {
+            const error: ResponceType & ResponseErrorType = {
+              status: 'error',
+              field: 'email',
+              message: 'not has offer or offer not confirm',
+            };
+            reply.code(400).send(error);
+            break;
+          }
+          case !!user: {
+            const error: ResponceType & ResponseErrorType = {
+              status: 'error',
+              field: 'email',
+              message: 'email is busy',
+            };
+            reply.code(400).send(error);
+            break;
+          }
+          default: {
+            const user = await fastify.controls.users.create({
+              email,
+              login,
+              password,
+              phone,
+              role: UserRole.client,
+            });
+            const result = await fastify.controls.users.createToken(
+              email,
+              password
+            );
+            const responce: ResponceType = {
+              status: 'ok',
+              data: result,
+            };
+            reply.send(responce);
+          }
         }
-        case !!user: {
-          const error: ResponceType & ResponseErrorType = {
-            status: 'error',
-            field: 'email',
-            message: 'email is busy',
-          };
+      } catch (error: any) {
+        if ('status' in error) {
           reply.code(400).send(error);
-          break;
-        }
-        default: {
-          const user = await fastify.controls.users.create({
-            email,
-            login,
-            password,
-            phone,
-            role: UserRole.client,
-          });
-          const result = await fastify.controls.users.createToken(
-            email,
-            password
-          );
-          const responce: ResponceType = {
-            status: 'ok',
-            data: result,
-          };
-          reply.send(responce);
+        } else {
+          reply.code(500).send(error);
         }
       }
     }
@@ -129,7 +139,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 type: 'object',
                 properties: {
@@ -139,17 +149,19 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
                     $ref: 'User',
                   },
                 },
+                required: ['access_token', 'refresh_token', 'user'],
               },
             },
+            required: ['status', 'data'],
           },
           400: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
@@ -166,16 +178,17 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           data: result,
         };
         reply.send(responce);
-      } catch (error) {
-        if ((error as any).status === 'error') {
-          reply.code(403).send(error);
+      } catch (error: any) {
+        if ('status' in error) {
+          reply.code(400).send(error);
+        } else {
+          reply.code(500).send(error);
         }
-        throw error;
       }
     }
   );
 
-  fastify.post<{ Body: { refresh_token: string; client_id: string } }>(
+  fastify.post<{ Body: { refresh_token: string; email: string } }>(
     '/refreshToken',
     {
       schema: {
@@ -183,9 +196,9 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           type: 'object',
           properties: {
             refresh_token: { type: 'string' },
-            client_id: { type: 'string' },
+            email: { type: 'string' },
           },
-          required: ['refresh_token', 'device_id'],
+          required: ['refresh_token', 'email'],
         },
         response: {
           200: {
@@ -201,8 +214,10 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
                     $ref: 'User',
                   },
                 },
+                required: ['access_token', 'refresh_token', 'user'],
               },
             },
+            required: ['status', 'data'],
           },
           400: {
             type: 'object',
@@ -211,19 +226,19 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
     },
     async (request, reply) => {
       try {
-        const { client_id, refresh_token } = request.body;
+        const { email, refresh_token } = request.body;
 
         const isValid = await fastify.controls.users.checkRefreshToken(
-          refresh_token,
-          client_id
+          refresh_token
         );
+
         if (!isValid) {
           throw new Error(NO_ACCESS_CODE_ERROR);
         }
@@ -235,9 +250,8 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
         if (!data) {
           throw new Error(NO_ACCESS_CODE_ERROR);
         }
-
         const result = await fastify.controls.users.createToken(
-          request.user.email,
+          email,
           data.password
         );
         const responce = {
@@ -245,11 +259,12 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           data: result,
         };
         reply.send(responce);
-      } catch (error) {
-        if ((error as any).status === 'error') {
-          reply.send(error);
+      } catch (error: any) {
+        if ('status' in error) {
+          reply.code(400).send(error);
+        } else {
+          reply.code(500).send(error);
         }
-        throw error;
       }
     }
   );

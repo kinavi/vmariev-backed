@@ -4,7 +4,6 @@ import connection from '../connection';
 export interface IUserRefreshTokenAttributes {
   id?: number;
   userId: number;
-  clientId: string;
   refreshToken: string;
 
   updatedAt?: Date;
@@ -18,7 +17,6 @@ class UserRefreshToken
 {
   public id!: number;
   public userId!: number;
-  public clientId!: string;
   public refreshToken!: string;
 
   public readonly updatedAt!: Date;
@@ -27,7 +25,6 @@ class UserRefreshToken
 
 UserRefreshToken.init(
   {
-    clientId: DataTypes.INTEGER,
     userId: DataTypes.STRING,
     refreshToken: DataTypes.STRING,
   },

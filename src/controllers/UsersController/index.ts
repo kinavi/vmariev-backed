@@ -53,16 +53,14 @@ export class UsersController {
     if (!user) {
       throw {
         status: 'error',
-        field: 'email',
-        message: 'Пользователь не найден',
+        message: 'Ошибка авторизации',
       };
     }
 
     if (!this.checkUser(user, password)) {
       throw {
         status: 'error',
-        field: 'password',
-        message: 'Не верный пароль',
+        message: 'Ошибка авторизации',
       };
     }
 
@@ -78,12 +76,10 @@ export class UsersController {
       }
     );
 
-    const clientId = uuidv4();
     const refresh_token = jwt.sign(
       {
         password,
         user_id: user.id,
-        client_id: clientId,
       },
       process.env.JWT_SECRET,
       {
@@ -98,7 +94,6 @@ export class UsersController {
     });
 
     await UserRefreshToken.create({
-      clientId: clientId,
       userId: user.id,
       refreshToken: refresh_token,
     });
@@ -110,18 +105,18 @@ export class UsersController {
     };
   };
 
-  checkRefreshToken = async (token: string, client_id: string) => {
+  checkRefreshToken = async (token: string) => {
     if (!process.env.JWT_SECRET) {
       throw 'no has JWT_SECRET';
     }
     const payload = await this.getRefreshTokenPayload(token);
+    console.log(payload);
     if (!payload) {
       return false;
     }
     const result = (await UserRefreshToken.findOne({
       where: {
         userId: payload['user_id'],
-        clientId: payload['client_id'],
       },
       include: [
         {
@@ -134,11 +129,9 @@ export class UsersController {
     if (!user) {
       return false;
     }
-    return (
-      result?.refreshToken === token &&
-      result.clientId === client_id &&
-      this.checkUser(user, payload.password)
-    );
+
+    const isValidToken = this.checkUser(user, payload.password);
+    return result?.refreshToken === token && isValidToken;
   };
 
   getRefreshTokenPayload = async (token: string) => {
@@ -146,10 +139,7 @@ export class UsersController {
       throw 'no has JWT_SECRET';
     }
     const data = await jwt.verify(token, process.env.JWT_SECRET);
-    if (
-      typeof data === 'string' ||
-      (!data['user_id'] && !data['client_id'] && !data['password'])
-    ) {
+    if (typeof data === 'string' || (!data['user_id'] && !data['password'])) {
       return null;
     }
     return {
