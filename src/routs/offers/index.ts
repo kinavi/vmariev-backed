@@ -30,18 +30,18 @@ export const offerRoutes: any = async (
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
             },
             required: ['status'],
           },
-          400: {
+          250: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
@@ -59,7 +59,7 @@ export const offerRoutes: any = async (
             field: 'email',
             message: 'Email is busy',
           };
-          reply.code(400).send(error);
+          reply.code(250).send(error);
           break;
         }
         default: {
@@ -101,18 +101,18 @@ export const offerRoutes: any = async (
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
             },
             required: ['status'],
           },
-          400: {
+          250: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
@@ -127,7 +127,7 @@ export const offerRoutes: any = async (
             field: 'email',
             message: 'not has offer by email',
           };
-          reply.code(400).send(error);
+          reply.code(250).send(error);
           break;
         }
         case offer?.code !== code: {
@@ -136,7 +136,7 @@ export const offerRoutes: any = async (
             field: 'code',
             message: 'code is not valid',
           };
-          reply.code(400).send(error);
+          reply.code(250).send(error);
           break;
         }
         case !!offer && !isAfter(new Date(offer.lifeDate), new Date()): {
@@ -145,7 +145,7 @@ export const offerRoutes: any = async (
             field: 'code',
             message: 'invitation expired',
           };
-          reply.code(400).send(error);
+          reply.code(250).send(error);
           break;
         }
         case !!offer?.isConfirm: {
@@ -154,7 +154,7 @@ export const offerRoutes: any = async (
             field: 'code',
             message: 'code has confirm',
           };
-          reply.code(400).send(error);
+          reply.code(250).send(error);
           break;
         }
         default: {

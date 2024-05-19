@@ -8,10 +8,8 @@ import {
 
 interface ICreateUserBody {
   password: string;
-  phone: string;
+  code: number;
   email: string;
-  login: string;
-  role: UserRole;
 }
 
 export const authRoutes: any = async (fastify: FastifyType, options: any) => {
@@ -21,22 +19,16 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
       schema: {
         body: {
           type: 'object',
-          required: ['password', 'phone', 'email', 'login', 'role'],
+          required: ['password', 'code', 'email'],
           properties: {
             password: {
-              type: 'string',
-            },
-            phone: {
               type: 'string',
             },
             email: {
               type: 'string',
             },
-            login: {
-              type: 'string',
-            },
-            role: {
-              type: 'string',
+            code: {
+              type: 'number',
             },
           },
         },
@@ -44,7 +36,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 type: 'object',
                 properties: {
@@ -59,10 +51,10 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
             },
             required: ['status', 'data'],
           },
-          400: {
+          250: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
@@ -73,50 +65,49 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
     },
     async (request, reply) => {
       try {
-        const { email, login, password, phone, role } = request.body;
+        const { email, password, code } = request.body;
         const user = await fastify.controls.users.getUserByEmail(email);
         const offer = await fastify.controls.offers.get(email);
-        switch (true) {
-          case !offer || !offer.isConfirm: {
-            const error: ResponceType & ResponseErrorType = {
-              status: 'error',
-              field: 'email',
-              message: 'not has offer or offer not confirm',
-            };
-            reply.code(400).send(error);
-            break;
-          }
-          case !!user: {
-            const error: ResponceType & ResponseErrorType = {
-              status: 'error',
-              field: 'email',
-              message: 'email is busy',
-            };
-            reply.code(400).send(error);
-            break;
-          }
-          default: {
-            const user = await fastify.controls.users.create({
-              email,
-              login,
-              password,
-              phone,
-              role: UserRole.client,
-            });
-            const result = await fastify.controls.users.createToken(
-              email,
-              password
-            );
-            const responce: ResponceType = {
-              status: 'ok',
-              data: result,
-            };
-            reply.send(responce);
-          }
+        if (!offer || offer.code !== code) {
+          const error: ResponceType & ResponseErrorType = {
+            status: 'error',
+            field: 'code',
+            message: 'not has offer or offer not confirm',
+          };
+          reply.code(250).send(error);
+          return;
         }
+        if (user) {
+          const error: ResponceType & ResponseErrorType = {
+            status: 'error',
+            field: 'email',
+            message: 'email is busy',
+          };
+          reply.code(250).send(error);
+          return;
+        }
+        await fastify.controls.users.create({
+          email,
+          login: '',
+          password,
+          phone: '',
+          role: UserRole.client,
+        });
+        if (offer.id) {
+          await fastify.controls.offers.confirm(offer.id);
+        }
+        const result = await fastify.controls.users.createToken(
+          email,
+          password
+        );
+        const responce: ResponceType = {
+          status: 'ok',
+          data: result,
+        };
+        reply.send(responce);
       } catch (error: any) {
         if ('status' in error) {
-          reply.code(400).send(error);
+          reply.code(250).send(error);
         } else {
           reply.code(500).send(error);
         }
