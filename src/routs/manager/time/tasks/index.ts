@@ -10,33 +10,33 @@ export const taskRoutes: any = async (
     '/',
     {
       schema: {
+        tags: ['Time'],
         body: {
           type: 'object',
           properties: {
             name: { type: 'string' },
             description: { type: 'string' },
-            userId: { type: 'number' },
           },
-          required: ['name', 'userId'],
+          required: ['name'],
         },
         response: {
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 $ref: 'Task',
               },
             },
           },
-          400: {
+          240: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
@@ -45,6 +45,7 @@ export const taskRoutes: any = async (
       const {
         body: { description, name },
       } = request;
+
       const result = await fastify.controls.tasks.create({
         description,
         name,
@@ -64,6 +65,7 @@ export const taskRoutes: any = async (
     '/',
     {
       schema: {
+        tags: ['Time'],
         body: {
           type: 'object',
           properties: {
@@ -77,20 +79,20 @@ export const taskRoutes: any = async (
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 $ref: 'Task',
               },
             },
           },
-          400: {
+          240: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
@@ -117,6 +119,7 @@ export const taskRoutes: any = async (
     '/',
     {
       schema: {
+        tags: ['Time'],
         querystring: {
           type: 'object',
           required: ['id'],
@@ -150,16 +153,27 @@ export const taskRoutes: any = async (
     '/',
     {
       schema: {
+        tags: ['Time'],
         response: {
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 type: 'array',
                 items: { $ref: 'Task' },
               },
             },
+            required: ['status', 'data'],
+          },
+          240: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status', 'message'],
           },
         },
       },
@@ -173,13 +187,13 @@ export const taskRoutes: any = async (
       reply.send(responce);
     }
   );
-
   fastify.get<{
     Params: { id: number };
   }>(
     '/:id',
     {
       schema: {
+        tags: ['Time'],
         params: {
           type: 'object',
           properties: {
@@ -191,11 +205,20 @@ export const taskRoutes: any = async (
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 $ref: 'Task',
               },
             },
+          },
+          240: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status', 'message'],
           },
         },
       },
@@ -203,11 +226,19 @@ export const taskRoutes: any = async (
     async (request, reply) => {
       const { id } = request.params;
       const result = await fastify.controls.tasks.get(id);
-      const responce: ResponceType = {
-        status: result ? 'ok' : 'error',
-        data: result,
-      };
-      reply.send(responce);
+      if (!result) {
+        const responce: ResponceType = {
+          status: 'error',
+          message: 'Something went wrong',
+        };
+        reply.send(responce);
+      } else {
+        const responce: ResponceType = {
+          status: 'ok',
+          data: result,
+        };
+        reply.send(responce);
+      }
     }
   );
 };

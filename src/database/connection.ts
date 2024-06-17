@@ -22,7 +22,7 @@ let sequelizeConnection: Sequelize = new Sequelize(
   {
     host: process.env.DB_HOST,
     dialect: 'mysql',
-    port: 8085,
+    port: Number(process.env.DB_PORT),
   }
 );
 

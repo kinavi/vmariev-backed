@@ -3,17 +3,30 @@ import { ICreateTaskData } from './types';
 
 export class TasksController {
   get = async (id: number) => {
-    const offer = await Task.findOne({
+    const result = await Task.findOne({
       where: {
         id,
       },
+      include: [
+        {
+          model: Track,
+          as: 'tracks',
+        },
+      ],
     });
-    return offer?.toJSON();
+    return result?.toJSON();
   };
 
   getAll = async () => {
-    const offer = await Task.findAll();
-    return offer?.map((item) => item.toJSON());
+    const result = await Task.findAll({
+      include: [
+        {
+          model: Track,
+          as: 'tracks',
+        },
+      ],
+    });
+    return result?.map((item) => item.toJSON());
   };
 
   getAllRunning = async (userId: number) => {
@@ -53,7 +66,9 @@ export class TasksController {
   };
 
   remove = async (id: number) => {
+    const tracks = await Track.findAll({ where: { taskId: id } });
     const result = await Task.destroy({ where: { id } });
+    tracks.map((track) => Track.destroy({ where: { id: track.id } }));
     return !!result;
   };
 }

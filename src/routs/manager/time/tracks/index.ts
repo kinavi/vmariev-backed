@@ -1,4 +1,3 @@
-import { ICreateTrackData } from '../../../../controllers/TracksControler/types';
 import {
   FastifyType,
   ResponceType,
@@ -14,6 +13,7 @@ export const tracksRoutes: any = async (
     '/start',
     {
       schema: {
+        tags: ['Time'],
         body: {
           type: 'object',
           properties: {
@@ -25,20 +25,21 @@ export const tracksRoutes: any = async (
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 $ref: 'Track',
               },
             },
+            required: ['status', 'data'],
           },
-          400: {
+          240: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
@@ -75,6 +76,7 @@ export const tracksRoutes: any = async (
     '/stop',
     {
       schema: {
+        tags: ['Time'],
         body: {
           type: 'object',
           properties: {
@@ -86,20 +88,21 @@ export const tracksRoutes: any = async (
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
               data: {
                 $ref: 'Track',
               },
             },
+            required: ['status', 'data'],
           },
-          400: {
+          240: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
               message: { type: 'string' },
             },
-            required: ['status', 'field', 'message'],
+            required: ['status', 'message'],
           },
         },
       },
