@@ -21,6 +21,12 @@ export type FastifyType = FastifyInstance & {
     tracks: TracksControler;
   };
   io: typeof socketioServer;
+  mailer: {
+    sendMail: (
+      options: { to: string; text: string },
+      callback: (error: any, info: { from: string; to: string }) => void
+    ) => void;
+  };
 };
 
 export type ResponseErrorType = {

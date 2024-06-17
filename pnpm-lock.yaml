@@ -41,6 +41,9 @@ dependencies:
   fastify-jwt:
     specifier: ^4.1.3
     version: 4.1.3
+  fastify-mailer:
+    specifier: ^2.3.1
+    version: 2.3.1(nodemailer@6.7.2)
   fastify-multer:
     specifier: ^2.0.3
     version: 2.0.3
@@ -3892,6 +3895,16 @@ packages:
       fastify-plugin: 3.0.1
       http-errors: 2.0.0
       steed: 1.1.3
+    dev: false
+
+  /fastify-mailer@2.3.1(nodemailer@6.7.2):
+    resolution: {integrity: sha512-SKMkgws+nYXLW1wwZuStxfRZ/y+QFfAfIakv70VSyqxm8uHqelbDX8p8d7bFUNOTH8gg5VeQnXymrKjKD6hOJw==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      nodemailer: '>=6.0.0'
+    dependencies:
+      fastify-plugin: 3.0.1
+      nodemailer: 6.7.2
     dev: false
 
   /fastify-multer@2.0.3:

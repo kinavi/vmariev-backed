@@ -44,6 +44,15 @@ export const privateOrdersRoutes: any = async (
             },
             required: ['status'],
           },
+          240: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status', 'message'],
+          },
         },
       },
     },
@@ -71,6 +80,15 @@ export const privateOrdersRoutes: any = async (
           })
         );
       }
+      if (!order) {
+        const responce: ResponceType = {
+          status: 'error',
+          message: 'not has order',
+        };
+        reply.code(240).send(responce);
+        return;
+      }
+
       const responce: ResponceType = {
         status: order ? 'ok' : 'error',
         data: order,

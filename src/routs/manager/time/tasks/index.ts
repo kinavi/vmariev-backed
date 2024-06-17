@@ -133,8 +133,17 @@ export const taskRoutes: any = async (
           200: {
             type: 'object',
             properties: {
-              status: { type: 'string', enum: ['ok', 'error'] },
+              status: { type: 'string', enum: ['ok'] },
             },
+          },
+          240: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status'],
           },
         },
       },

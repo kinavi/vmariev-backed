@@ -46,9 +46,21 @@ export class Server {
     this.fastify = Fastify({
       logger: envToLogger.development ?? true,
       // https: {
-      //   key: readFileSync(path.join(__dirname, '..', 'https', 'fastify.key')),
-      //   cert: readFileSync(path.join(__dirname, '..', 'https', 'fastify.cert')),
+      //   key: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.key')),
+      //   cert: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.cert')),
       // },
+    });
+    this.fastify.register(require('fastify-mailer'), {
+      defaults: { from: `vmariev <${process.env.MAILER_LOGIN}>` },
+      transport: {
+        host: process.env.MAILER_HOST,
+        port: 465,
+        secure: true, // use TLS
+        auth: {
+          user: process.env.MAILER_LOGIN,
+          pass: process.env.MAILER_PASSWORD,
+        },
+      },
     });
     this.fastify.decorate('controls', {
       orders: new OrdersController(),

@@ -34,7 +34,7 @@ export const offerRoutes: any = async (
             },
             required: ['status'],
           },
-          250: {
+          240: {
             type: 'object',
             properties: {
               status: { type: 'string', enum: ['error'] },
@@ -67,15 +67,19 @@ export const offerRoutes: any = async (
             await fastify.controls.offers.remove(email);
           }
           const code = await fastify.controls.offers.create(email, '999999');
-
-          // TODO: настроить клиент для рассылки
-          // fastify.mailer.SendMail(email, {
-          //     subject: `Заявка на регестрацию`,
-          //     text: `Код подтвеждения регистрации`,
-          //     html: `<h1>Код подтвеждения регистрации</h1>
-          //         <span>Код: ${code}</span>
-          //     `,
-          // })
+          fastify.mailer.sendMail(
+            {
+              to: email,
+              text: `Код подтвеждения регистрации: ` + code,
+            },
+            (errors, info) => {
+              if (errors) {
+                fastify.log.error(errors);
+              } else {
+                fastify.log.info('send confirm code to: ' + info.to);
+              }
+            }
+          );
           const responce: ResponceType = {
             status: 'ok',
           };
@@ -105,7 +109,7 @@ export const offerRoutes: any = async (
             },
             required: ['status'],
           },
-          250: {
+          240: {
             type: 'object',
             properties: {
               status: { type: 'string', enum: ['error'] },
