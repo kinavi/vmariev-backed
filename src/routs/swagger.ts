@@ -168,11 +168,12 @@ export const swaggerPlugin: any = async (
   fastify.addSchema({
     $id: 'Track',
     type: 'object',
-    required: ['id', 'dateStart'],
+    required: ['id', 'dateStart', 'limit'],
     properties: {
       id: { type: 'number' },
       dateStart: { type: 'string' },
       dateStop: { type: 'string', nullable: true },
+      limit: { type: 'number' },
     },
   });
   fastify.register(routs, { prefix: '/api', logLevel: 'debug' });

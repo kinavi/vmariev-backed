@@ -9,7 +9,7 @@ export const tracksRoutes: any = async (
   options: any,
   done: any
 ) => {
-  fastify.post<{ Body: { taskId: number } }>(
+  fastify.post<{ Body: { taskId: number; limit: number } }>(
     '/start',
     {
       schema: {
@@ -18,8 +18,9 @@ export const tracksRoutes: any = async (
           type: 'object',
           properties: {
             taskId: { type: 'number' },
+            limit: { type: 'number' },
           },
-          required: ['taskId'],
+          required: ['taskId', 'limit'],
         },
         response: {
           200: {
@@ -46,7 +47,7 @@ export const tracksRoutes: any = async (
     },
     async (request, reply) => {
       const {
-        body: { taskId },
+        body: { taskId, limit },
       } = request;
       const runningTasks = await fastify.controls.tasks.getAllRunning(
         request.user.id!
@@ -63,6 +64,7 @@ export const tracksRoutes: any = async (
       const result = await fastify.controls.tracks.create({
         dateStart: new Date(),
         taskId,
+        limit,
       });
       const responce: ResponceType = {
         status: 'ok',

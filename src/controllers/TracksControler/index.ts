@@ -17,10 +17,11 @@ export class TracksControler {
   };
 
   create = async (data: ICreateTrackData) => {
-    const { dateStart, taskId } = data;
+    const { dateStart, taskId, limit } = data;
     const result = await Track.create({
       dateStart,
       taskId,
+      limit,
     });
     return result.toJSON();
   };
