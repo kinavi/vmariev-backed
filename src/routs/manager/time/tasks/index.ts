@@ -189,9 +189,25 @@ export const taskRoutes: any = async (
     },
     async (request, reply) => {
       const result = await fastify.controls.tasks.getAll();
+      const enrichData = result.map((item) => ({
+        ...item,
+        totalTime: item.tracks.reduce((acc, item) => {
+          const deltaTiem =
+            item.dateStop &&
+            item.dateStop?.getTime() - item.dateStart.getTime();
+          if (!deltaTiem) {
+            return acc;
+          }
+          if (item.limit > deltaTiem) {
+            return +acc + deltaTiem;
+          }
+          return +acc + item.limit;
+        }, 0),
+        currentTrack: item.tracks.find((item) => item.dateStop === null),
+      }));
       const responce: ResponceType = {
         status: 'ok',
-        data: result,
+        data: enrichData,
       };
       reply.send(responce);
     }
@@ -242,9 +258,25 @@ export const taskRoutes: any = async (
         };
         reply.send(responce);
       } else {
+        const enrichData = {
+          ...result,
+          totalTime: result.tracks.reduce((acc, item) => {
+            const deltaTiem =
+              item.dateStop &&
+              item.dateStop?.getTime() - item.dateStart.getTime();
+            if (!deltaTiem) {
+              return acc;
+            }
+            if (item.limit > deltaTiem) {
+              return +acc + deltaTiem;
+            }
+            return +acc + item.limit;
+          }, 0),
+          currentTrack: result.tracks.find((item) => item.dateStop === null),
+        };
         const responce: ResponceType = {
           status: 'ok',
-          data: result,
+          data: enrichData,
         };
         reply.send(responce);
       }

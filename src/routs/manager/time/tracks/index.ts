@@ -132,4 +132,66 @@ export const tracksRoutes: any = async (
       reply.send(responce);
     }
   );
+
+  fastify.get<{
+    Querystring: { taskId: number; startData: string; endData: string };
+  }>(
+    '/',
+    {
+      schema: {
+        tags: ['Time'],
+        querystring: {
+          type: 'object',
+          required: ['taskId'],
+          properties: {
+            taskId: {
+              type: 'number',
+            },
+            startData: {
+              type: 'string',
+            },
+            endData: {
+              type: 'string',
+            },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['ok'] },
+              data: {
+                type: 'array',
+                items: { $ref: 'Track' },
+              },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const {
+        query: { taskId, endData, startData },
+      } = request;
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const startOfMonth = startData
+        ? new Date(startData)
+        : new Date(year, month, 1);
+      const endOfMonth = endData
+        ? new Date(endData)
+        : new Date(year, month + 1, 0);
+      const result = await fastify.controls.tracks.getCurrentMonth(
+        taskId,
+        startOfMonth,
+        endOfMonth
+      );
+      const responce: ResponceType = {
+        status: 'ok',
+        data: result,
+      };
+      reply.send(responce);
+    }
+  );
 };

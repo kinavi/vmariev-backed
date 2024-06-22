@@ -1,8 +1,13 @@
+import { Sequelize } from 'sequelize';
 import { Task, Track } from '../../database/models';
 import { ICreateTaskData } from './types';
+import { TaskAttributes } from '../../database/models/task';
+import { TrackAttributes } from '../../database/models/track';
 
 export class TasksController {
-  get = async (id: number) => {
+  get = async (
+    id: number
+  ): Promise<(TaskAttributes & { tracks: TrackAttributes[] }) | null> => {
     const result = await Task.findOne({
       where: {
         id,
@@ -14,19 +19,43 @@ export class TasksController {
         },
       ],
     });
-    return result?.toJSON();
+    return (
+      (result?.toJSON() as TaskAttributes & { tracks: TrackAttributes[] }) ||
+      null
+    );
   };
 
-  getAll = async () => {
+  getAll = async (): Promise<
+    (TaskAttributes & { tracks: TrackAttributes[] })[]
+  > => {
     const result = await Task.findAll({
       include: [
         {
           model: Track,
           as: 'tracks',
+          // required: false,
+          // where: {
+          //   dateStop: null,
+          // },
+          // attributes: [
+          //   'id',
+          //   'dateStop',
+          //   'dateStart',
+          //   'limit',
+          //   'taskId',
+          //   [
+          //     Sequelize.fn(
+          //       'DATEDIFF',
+          //       Sequelize.col('dateStop'),
+          //       Sequelize.col('dateStart')
+          //     ),
+          //     'deltaTime',
+          //   ],
+          // ],
         },
       ],
     });
-    return result?.map((item) => item.toJSON());
+    return result?.map((item) => item.toJSON()) || [];
   };
 
   getAllRunning = async (userId: number) => {

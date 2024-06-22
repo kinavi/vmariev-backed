@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import Track, { TrackAttributes } from '../../database/models/track';
 import { ICreateTrackData } from './types';
 
@@ -34,5 +35,18 @@ export class TracksControler {
   remove = async (id: number) => {
     const result = await Track.destroy({ where: { id } });
     return !!result;
+  };
+
+  getCurrentMonth = async (taskId: number, startOfMonth: Date, endOfMonth: Date) => {
+    const result = await Track.findAll({
+      where: {
+        taskId,
+        dateStart: {
+          [Op.gte]: startOfMonth,
+          [Op.lt]: endOfMonth,
+        },
+      },
+    });
+    return result?.map((item) => item.toJSON());
   };
 }

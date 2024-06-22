@@ -151,7 +151,7 @@ export const swaggerPlugin: any = async (
   fastify.addSchema({
     $id: 'Task',
     type: 'object',
-    required: ['id', 'name', 'userId'],
+    required: ['id', 'name', 'userId', 'totalTime'],
     properties: {
       id: { type: 'number' },
       name: { type: 'string' },
@@ -159,10 +159,8 @@ export const swaggerPlugin: any = async (
       userId: { type: 'number' },
       createdAt: { type: 'string' },
       updatedAt: { type: 'string' },
-      tracks: {
-        type: 'array',
-        items: { $ref: 'Track' },
-      },
+      currentTrack: { $ref: 'Track' },
+      totalTime: { type: 'number' },
     },
   });
   fastify.addSchema({
@@ -174,6 +172,7 @@ export const swaggerPlugin: any = async (
       dateStart: { type: 'string' },
       dateStop: { type: 'string', nullable: true },
       limit: { type: 'number' },
+      deltaTime: { type: 'number' },
     },
   });
   fastify.register(routs, { prefix: '/api', logLevel: 'debug' });
