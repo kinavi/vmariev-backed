@@ -159,7 +159,9 @@ export const swaggerPlugin: any = async (
       userId: { type: 'number' },
       createdAt: { type: 'string' },
       updatedAt: { type: 'string' },
-      currentTrack: { $ref: 'Track' },
+      currentTrack: {
+        allOf: [{ $ref: 'Track' }, { type: 'object', nullable: true }],
+      },
       totalTime: { type: 'number' },
     },
   });

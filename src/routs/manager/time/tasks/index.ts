@@ -51,9 +51,16 @@ export const taskRoutes: any = async (
         name,
         userId: request.user.id!,
       });
+
+      const enrichData = {
+        ...result,
+        totalTime: 0,
+        currentTrack: null,
+      };
+
       const responce: ResponceType = {
         status: 'ok',
-        data: result,
+        data: enrichData,
       };
       reply.send(responce);
     }
@@ -105,11 +112,35 @@ export const taskRoutes: any = async (
         description,
         name,
       });
-      const responce: ResponceType = {
-        status: 'ok',
-        data: result,
-      };
-      reply.send(responce);
+      if (!result) {
+        const responce: ResponceType = {
+          status: 'error',
+          message: 'Что-то пошло не так',
+        };
+        reply.code(240).send(responce);
+      } else {
+        const enrichData = {
+          ...result,
+          totalTime: result.tracks.reduce((acc, item) => {
+            const deltaTiem =
+              item.dateStop &&
+              item.dateStop?.getTime() - item.dateStart.getTime();
+            if (!deltaTiem) {
+              return acc;
+            }
+            if (item.limit > deltaTiem) {
+              return +acc + deltaTiem;
+            }
+            return +acc + item.limit;
+          }, 0),
+          currentTrack: result.tracks.find((item) => item.dateStop === null),
+        };
+        const responce: ResponceType = {
+          status: 'ok',
+          data: enrichData,
+        };
+        reply.send(responce);
+      }
     }
   );
 
