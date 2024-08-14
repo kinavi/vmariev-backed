@@ -45,10 +45,10 @@ export class Server {
     this.port = port;
     this.fastify = Fastify({
       logger: envToLogger.development ?? true,
-      // https: {
-      //   key: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.key')),
-      //   cert: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.cert')),
-      // },
+      https: {
+        key: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.key')),
+        cert: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.cert')),
+      },
     });
     this.fastify.register(require('fastify-mailer'), {
       defaults: { from: `vmariev <${process.env.MAILER_LOGIN}>` },

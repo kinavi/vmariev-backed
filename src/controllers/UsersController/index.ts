@@ -110,7 +110,6 @@ export class UsersController {
       throw 'no has JWT_SECRET';
     }
     const payload = await this.getRefreshTokenPayload(token);
-    console.log(payload);
     if (!payload) {
       return false;
     }

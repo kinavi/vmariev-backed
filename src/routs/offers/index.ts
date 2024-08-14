@@ -59,7 +59,7 @@ export const offerRoutes: any = async (
             field: 'email',
             message: 'Email is busy',
           };
-          reply.code(250).send(error);
+          reply.code(240).send(error);
           break;
         }
         default: {

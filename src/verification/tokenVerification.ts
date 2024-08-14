@@ -1,4 +1,4 @@
-import { NO_ACCESS_CODE_ERROR } from '../constants';
+import { NO_ACCESS_CODE_ERROR, UNAUTHORIZED_CODE_ERROR } from '../constants';
 import { FastifyType, UserRole } from '../types';
 
 export const tokenVerification = (fastify: FastifyType) => {
@@ -8,13 +8,12 @@ export const tokenVerification = (fastify: FastifyType) => {
       const authorization = request.headers.authorization;
       const token = (authorization as any).replace(/Bearer\s*/gi, '');
       const user = await fastify.controls.users.checkAccessToken(token);
-      console.log('user', user);
       if (!user) {
-        throw new Error(NO_ACCESS_CODE_ERROR);
+        throw new Error(UNAUTHORIZED_CODE_ERROR);
       }
       request.user = user;
     } catch (error) {
-      throw new Error(NO_ACCESS_CODE_ERROR);
+      throw new Error(UNAUTHORIZED_CODE_ERROR);
     }
   });
 };

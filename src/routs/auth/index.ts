@@ -1,4 +1,4 @@
-import { NO_ACCESS_CODE_ERROR } from '../../constants';
+import { NO_ACCESS_CODE_ERROR, UNAUTHORIZED_CODE_ERROR } from '../../constants';
 import {
   ResponseErrorType,
   FastifyType,
@@ -223,40 +223,34 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
       },
     },
     async (request, reply) => {
-      try {
-        const { email, refresh_token } = request.body;
+      const { email, refresh_token } = request.body;
 
-        const isValid = await fastify.controls.users.checkRefreshToken(
-          refresh_token
-        );
+      const isValid = await fastify.controls.users.checkRefreshToken(
+        refresh_token
+      );
 
-        if (!isValid) {
-          throw new Error(NO_ACCESS_CODE_ERROR);
-        }
-
-        const data = await fastify.controls.users.getRefreshTokenPayload(
-          refresh_token
-        );
-
-        if (!data) {
-          throw new Error(NO_ACCESS_CODE_ERROR);
-        }
-        const result = await fastify.controls.users.createToken(
-          email,
-          data.password
-        );
-        const responce = {
-          status: 'ok',
-          data: result,
-        };
-        reply.send(responce);
-      } catch (error: any) {
-        if ('status' in error) {
-          reply.code(400).send(error);
-        } else {
-          reply.code(500).send(error);
-        }
+      if (!isValid) {
+        throw new Error(UNAUTHORIZED_CODE_ERROR);
       }
+
+      const data = await fastify.controls.users.getRefreshTokenPayload(
+        refresh_token
+      );
+
+      if (!data) {
+        throw new Error(UNAUTHORIZED_CODE_ERROR);
+      }
+
+      const result = await fastify.controls.users.createToken(
+        email,
+        data.password
+      );
+
+      const responce = {
+        status: 'ok',
+        data: result,
+      };
+      reply.send(responce);
     }
   );
 };
