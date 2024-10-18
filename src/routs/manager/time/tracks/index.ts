@@ -112,6 +112,7 @@ export const tracksRoutes: any = async (
     async (request, reply) => {
       const {
         body: { id },
+        user
       } = request;
       const targetTrack = await fastify.controls.tracks.get(id);
       if (!targetTrack) {

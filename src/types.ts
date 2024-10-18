@@ -6,6 +6,8 @@ import {
   OrdersController,
   ReviewsController,
   UsersController,
+  FoodsController,
+  UserProgramController,
 } from './controllers';
 import { TasksController } from './controllers/TasksController';
 import { TracksControler } from './controllers/TracksControler';
@@ -19,6 +21,10 @@ export type FastifyType = FastifyInstance & {
     orders: OrdersController;
     tasks: TasksController;
     tracks: TracksControler;
+    glutton: {
+      food: FoodsController;
+      userProgram: UserProgramController;
+    };
   };
   io: typeof socketioServer;
   mailer: {

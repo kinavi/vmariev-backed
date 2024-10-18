@@ -8,9 +8,11 @@ import cors from '@fastify/cors';
 import ioSocket from 'fastify-socket.io';
 import {
   FilesController,
+  FoodsController,
   OffersController,
   OrdersController,
   ReviewsController,
+  UserProgramController,
   UsersController,
 } from './controllers';
 import { swaggerPlugin } from './routs/swagger';
@@ -70,6 +72,10 @@ export class Server {
       files: new FilesController(),
       tasks: new TasksController(),
       tracks: new TracksControler(),
+      glutton: {
+        food: new FoodsController(),
+        userProgram: new UserProgramController(),
+      },
     } as FastifyType['controls']);
     this.fastify.register(swaggerPlugin);
     this.fastify.register(middie);

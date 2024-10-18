@@ -177,5 +177,32 @@ export const swaggerPlugin: any = async (
       deltaTime: { type: 'number' },
     },
   });
+
+  fastify.addSchema({
+    $id: 'Food',
+    type: 'object',
+    required: ['id', 'title', 'proteins', 'fats', 'carbohydrates'],
+    properties: {
+      id: { type: 'number' },
+      title: { type: 'string' },
+      proteins: { type: 'number' },
+      fats: { type: 'number' },
+      carbohydrates: { type: 'number' },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'UserProgram',
+    type: 'object',
+    required: ['id', 'sex', 'age', 'physicalActivity', 'goal'],
+    properties: {
+      id: { type: 'number' },
+      sex: { type: 'string' },
+      age: { type: 'number' },
+      physicalActivity: { type: 'number' },
+      goal: { type: 'number' },
+    },
+  });
+
   fastify.register(routs, { prefix: '/api', logLevel: 'debug' });
 };
