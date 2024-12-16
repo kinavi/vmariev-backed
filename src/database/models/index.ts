@@ -7,10 +7,11 @@ import Task from './task';
 import Track from './track';
 import UserRefreshToken from './userRefreshToken';
 import Food from './food';
-import Meal from './meal';
+import MealEntry from './mealEntrie';
 import MealTimer from './mealTimer';
 import FoodUser from './foodUser';
 import UserProgram from './userProgram';
+import UserProgramMealEntry from './userProgramMealEntries';
 
 UserProgram.belongsTo(User, {
   as: 'user',
@@ -24,7 +25,7 @@ UserProgram.belongsTo(User, {
 User.belongsToMany(Food, { through: FoodUser, foreignKey: 'foodId' });
 Food.belongsToMany(User, { through: FoodUser, foreignKey: 'userId' });
 
-Meal.belongsTo(User, {
+MealEntry.belongsTo(User, {
   as: 'user',
   foreignKey: {
     name: 'userId',
@@ -33,10 +34,25 @@ Meal.belongsTo(User, {
   foreignKeyConstraint: true,
 });
 
-Meal.belongsTo(Food, {
+MealEntry.belongsTo(Food, {
   as: 'food',
   foreignKey: {
     name: 'foodId',
+    allowNull: false,
+  },
+  foreignKeyConstraint: true,
+});
+
+UserProgram.belongsToMany(MealEntry, {
+  through: UserProgramMealEntry,
+  foreignKey: 'userId',
+  as: 'mealEntry',
+});
+
+MealEntry.belongsTo(UserProgram, {
+  as: 'userProgram',
+  foreignKey: {
+    name: 'userProgramId',
     allowNull: false,
   },
   foreignKeyConstraint: true,
@@ -161,7 +177,7 @@ export {
   Track,
   UserRefreshToken,
   Food,
-  Meal,
+  MealEntry as Meal,
   MealTimer,
   FoodUser,
   UserProgram,

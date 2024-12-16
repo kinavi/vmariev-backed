@@ -3,6 +3,11 @@ import { OrderTypeEnum } from '../database/models/order';
 import { routs } from '.';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
+import UserProgram, {
+  ActivityType,
+  GoalType,
+  SexType,
+} from '../database/models/userProgram';
 
 export const swaggerPlugin: any = async (
   fastify: FastifyType,
@@ -194,13 +199,57 @@ export const swaggerPlugin: any = async (
   fastify.addSchema({
     $id: 'UserProgram',
     type: 'object',
-    required: ['id', 'sex', 'age', 'physicalActivity', 'goal'],
+    required: [
+      'id',
+      'sex',
+      'age',
+      'physicalActivity',
+      'goal',
+      'weight',
+      'height',
+      'ratioCarbohydrates',
+      'ratioProteins',
+      'ratioFats',
+      'isExcludeActivity',
+    ],
     properties: {
       id: { type: 'number' },
-      sex: { type: 'string' },
+      sex: { type: 'string', enum: [SexType.MALE, SexType.FEMALE] },
       age: { type: 'number' },
-      physicalActivity: { type: 'number' },
-      goal: { type: 'number' },
+      physicalActivity: {
+        type: 'string',
+        enum: [
+          ActivityType.LOW,
+          ActivityType.LIGHT,
+          ActivityType.MIDDLE,
+          ActivityType.HIGH,
+          ActivityType.EXTREME,
+        ],
+      },
+      goal: {
+        type: 'string',
+        enum: [GoalType.MASS_GAIN, GoalType.NORMAL, GoalType.WEIGHT_LOSS],
+      },
+      weight: { type: 'number' },
+      height: { type: 'number' },
+      ratioCarbohydrates: { type: 'number' },
+      ratioProteins: { type: 'number' },
+      ratioFats: { type: 'number' },
+      isExcludeActivity: { type: 'boolean' },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'MealEntry',
+    type: 'object',
+    required: ['id', 'food', 'user', 'weight', 'userProgram', 'createdAt'],
+    properties: {
+      id: { type: 'number' },
+      food: { $ref: 'Food' },
+      user: { $ref: 'User' },
+      userProgram: { $ref: 'UserProgram' },
+      weight: { type: 'number' },
+      createdAt: { type: 'string' },
     },
   });
 

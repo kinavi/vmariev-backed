@@ -171,4 +171,63 @@ export const offerRoutes: any = async (
       }
     }
   );
+  fastify.get<{ Querystring: IConfirmOfferBody }>(
+    '/check',
+    {
+      schema: {
+        querystring: {
+          type: 'object',
+          properties: {
+            email: { type: 'string' },
+            code: { type: 'number' },
+          },
+          required: ['email', 'code'],
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['ok'] },
+            },
+            required: ['status'],
+          },
+          240: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status', 'message'],
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { code, email } = request.query;
+      const offer = await fastify.controls.offers.get(email);
+      if (!offer) {
+        const error: ResponceType & ResponseErrorType = {
+          status: 'error',
+          field: 'email',
+          message: 'not has offer by email',
+        };
+        reply.code(240).send(error);
+        return;
+      }
+      if (offer.code != code) {
+        const error: ResponceType & ResponseErrorType = {
+          status: 'error',
+          field: 'code',
+          message: 'code is not valid',
+        };
+        reply.code(240).send(error);
+        return;
+      }
+      const responce: ResponceType = {
+        status: 'ok',
+      };
+      reply.send(responce);
+    }
+  );
 };

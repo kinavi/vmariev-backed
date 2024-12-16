@@ -1,16 +1,41 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
 import connection from '../connection';
 
+export enum SexType {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+}
+
+export enum ActivityType {
+  LOW = 'LOW',
+  LIGHT = 'LIGHT',
+  MIDDLE = 'MIDDLE',
+  HIGH = 'HIGH',
+  EXTREME = 'EXTREME',
+}
+
+export enum GoalType {
+  MASS_GAIN = 'MASS_GAIN',
+  NORMAL = 'NORMAL',
+  WEIGHT_LOSS = 'WEIGHT_LOSS',
+}
+
 export interface UserProgramAttributes {
   id?: number;
   userId: number;
-  sex: string;
+  sex: SexType;
   age: number;
-  physicalActivity: number;
-  goal: number;
+  weight: number;
+  height: number;
+  physicalActivity: ActivityType;
+  goal: GoalType;
   updatedAt?: Date;
   deletedAt?: Date;
   createdAt?: Date;
+  ratioCarbohydrates: number;
+  ratioProteins: number;
+  ratioFats: number;
+  isExcludeActivity: boolean;
 }
 
 class UserProgram
@@ -19,10 +44,16 @@ class UserProgram
 {
   public id!: number;
   public userId!: number;
-  public sex!: string;
+  public sex!: SexType;
   public age!: number;
-  public physicalActivity!: number;
-  public goal!: number;
+  public weight!: number;
+  public height!: number;
+  public physicalActivity!: ActivityType;
+  public goal!: GoalType;
+  public ratioCarbohydrates!: number;
+  public ratioProteins!: number;
+  public ratioFats!: number;
+  public isExcludeActivity!: boolean;
 
   public readonly updatedAt!: Date;
   public readonly createdAt!: Date;
@@ -31,10 +62,26 @@ class UserProgram
 UserProgram.init(
   {
     userId: DataTypes.INTEGER,
-    sex: DataTypes.STRING,
+    sex: DataTypes.ENUM(SexType.MALE, SexType.FEMALE),
     age: DataTypes.INTEGER,
-    goal: DataTypes.INTEGER,
-    physicalActivity: DataTypes.INTEGER,
+    goal: DataTypes.ENUM(
+      GoalType.MASS_GAIN,
+      GoalType.NORMAL,
+      GoalType.WEIGHT_LOSS
+    ),
+    physicalActivity: DataTypes.ENUM(
+      ActivityType.LOW,
+      ActivityType.LIGHT,
+      ActivityType.MIDDLE,
+      ActivityType.HIGH,
+      ActivityType.EXTREME
+    ),
+    height: DataTypes.INTEGER,
+    weight: DataTypes.INTEGER,
+    ratioCarbohydrates: DataTypes.INTEGER,
+    ratioProteins: DataTypes.INTEGER,
+    ratioFats: DataTypes.INTEGER,
+    isExcludeActivity: DataTypes.BOOLEAN,
   },
   {
     sequelize: connection,

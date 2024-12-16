@@ -1,5 +1,6 @@
 'use strict';
 import { DataTypes, QueryInterface } from 'sequelize';
+import { ActivityType, GoalType, SexType } from '../models/userProgram';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -16,20 +17,41 @@ module.exports = {
         allowNull: false,
       },
       sex: {
-        type: Sequelize.STRING,
+        type: DataTypes.ENUM(SexType.MALE, SexType.FEMALE),
         allowNull: false,
+        defaultValue: SexType.MALE,
       },
       age: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      physicalActivity: {
+      weight: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
-      goal: {
+      height: {
         type: Sequelize.INTEGER,
         allowNull: false,
+      },
+      physicalActivity: {
+        type: DataTypes.ENUM(
+          ActivityType.LOW,
+          ActivityType.LIGHT,
+          ActivityType.MIDDLE,
+          ActivityType.HIGH,
+          ActivityType.EXTREME
+        ),
+        allowNull: false,
+        defaultValue: ActivityType.LOW,
+      },
+      goal: {
+        type: DataTypes.ENUM(
+          GoalType.MASS_GAIN,
+          GoalType.NORMAL,
+          GoalType.WEIGHT_LOSS
+        ),
+        allowNull: false,
+        defaultValue: GoalType.NORMAL,
       },
       createdAt: {
         allowNull: false,
@@ -38,6 +60,22 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+      },
+      ratioCarbohydrates: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
+      ratioProteins: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
+      ratioFats: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
+      },
+      isExcludeActivity: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
       },
     });
   },

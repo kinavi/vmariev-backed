@@ -1,6 +1,7 @@
 import { FastifyType } from '../../types';
 import { tokenVerification } from '../../verification/tokenVerification';
 import { foodsRoutes } from './foods';
+import { mealEntriesRoutes } from './mealEntries';
 import { userProgramsRoutes } from './userProgram';
 
 export const gluttonRouts: any = async (
@@ -10,5 +11,6 @@ export const gluttonRouts: any = async (
 ) => {
   await tokenVerification(fastify);
   fastify.register(foodsRoutes, { prefix: '/foods' });
-  fastify.register(userProgramsRoutes, { prefix: '/userPrograms' });
+  fastify.register(userProgramsRoutes, { prefix: '/userProgram' });
+  fastify.register(mealEntriesRoutes, { prefix: '/mealEntries' });
 };

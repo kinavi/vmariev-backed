@@ -11,6 +11,7 @@ import {
 } from './controllers';
 import { TasksController } from './controllers/TasksController';
 import { TracksControler } from './controllers/TracksControler';
+import { MealEntriesController } from './controllers/MealsController';
 
 export type FastifyType = FastifyInstance & {
   controls: {
@@ -24,6 +25,7 @@ export type FastifyType = FastifyInstance & {
     glutton: {
       food: FoodsController;
       userProgram: UserProgramController;
+      mealsEntries: MealEntriesController;
     };
   };
   io: typeof socketioServer;

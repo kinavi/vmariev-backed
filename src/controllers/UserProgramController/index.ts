@@ -7,7 +7,41 @@ export class UserProgramController {
       where: {
         id,
       },
-      attributes: ['id', 'age', 'goal', 'physicalActivity', 'sex'],
+      attributes: [
+        'id',
+        'age',
+        'goal',
+        'physicalActivity',
+        'sex',
+        'height',
+        'weight',
+        'ratioCarbohydrates',
+        'ratioProteins',
+        'ratioFats',
+        'isExcludeActivity',
+      ],
+    });
+    return result?.toJSON();
+  };
+
+  getByUserId = async (userId: number) => {
+    const result = await UserProgram.findOne({
+      where: {
+        userId,
+      },
+      attributes: [
+        'id',
+        'age',
+        'goal',
+        'physicalActivity',
+        'sex',
+        'height',
+        'weight',
+        'ratioCarbohydrates',
+        'ratioProteins',
+        'ratioFats',
+        'isExcludeActivity',
+      ],
     });
     return result?.toJSON();
   };
@@ -17,19 +51,49 @@ export class UserProgramController {
       where: {
         userId,
       },
-      attributes: ['id', 'age', 'goal', 'physicalActivity', 'sex'],
+      attributes: [
+        'id',
+        'age',
+        'goal',
+        'physicalActivity',
+        'sex',
+        'height',
+        'weight',
+        'ratioCarbohydrates',
+        'ratioProteins',
+        'ratioFats',
+        'isExcludeActivity',
+      ],
     });
     return !!result;
   };
 
   create = async (data: UserProgramAttributes) => {
-    const { userId, age, goal, physicalActivity, sex } = data;
+    const {
+      userId,
+      age,
+      goal,
+      physicalActivity,
+      sex,
+      height,
+      weight,
+      ratioCarbohydrates,
+      ratioFats,
+      ratioProteins,
+      isExcludeActivity,
+    } = data;
     const result = await UserProgram.create({
       userId,
       age,
       goal,
       physicalActivity,
       sex,
+      height,
+      weight,
+      ratioCarbohydrates,
+      ratioFats,
+      ratioProteins,
+      isExcludeActivity,
     });
     return this.get(result.id);
   };
@@ -38,7 +102,13 @@ export class UserProgramController {
     id: number,
     data: Pick<
       UserProgramAttributes,
-      'age' | 'goal' | 'physicalActivity' | 'sex'
+      | 'age'
+      | 'goal'
+      | 'physicalActivity'
+      | 'sex'
+      | 'height'
+      | 'weight'
+      | 'isExcludeActivity'
     >
   ) => {
     const [affectedCount] = await UserProgram.update(data, { where: { id } });

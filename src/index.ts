@@ -19,6 +19,7 @@ import { swaggerPlugin } from './routs/swagger';
 import { TasksController } from './controllers/TasksController';
 import { TracksControler } from './controllers/TracksControler';
 import { FastifyType } from './types';
+import { MealEntriesController } from './controllers/MealsController';
 
 export const upload = multer({ dest: 'uploads/' });
 
@@ -75,6 +76,7 @@ export class Server {
       glutton: {
         food: new FoodsController(),
         userProgram: new UserProgramController(),
+        mealsEntries: new MealEntriesController(),
       },
     } as FastifyType['controls']);
     this.fastify.register(swaggerPlugin);
