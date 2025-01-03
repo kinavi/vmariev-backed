@@ -16,7 +16,7 @@ export class FilesController {
         id,
       },
       include: [
-        { model: User, as: 'user' },
+        { model: User, as: 'user',  attributes: ['id', 'email'] },
         {
           model: Order,
           as: 'order',
@@ -32,7 +32,7 @@ export class FilesController {
         id,
       },
       include: [
-        { model: User, as: 'user' },
+        { model: User, as: 'user',  attributes: ['id', 'email'] },
         {
           model: Order,
           as: 'order',

@@ -3,11 +3,13 @@ import { OrderTypeEnum } from '../database/models/order';
 import { routs } from '.';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
-import UserProgram, {
+import {
   ActivityType,
   GoalType,
   SexType,
 } from '../database/models/userProgram';
+import { DishStatus } from '../database/models/dish';
+import { MealEntryType } from '../database/models/mealEntrie';
 
 export const swaggerPlugin: any = async (
   fastify: FastifyType,
@@ -56,6 +58,17 @@ export const swaggerPlugin: any = async (
       updatedAt: { type: 'string' },
     },
   });
+
+  fastify.addSchema({
+    $id: 'SlimUser',
+    type: 'object',
+    required: ['id', 'email'],
+    properties: {
+      id: { type: 'number' },
+      email: { type: 'string' },
+    },
+  });
+
   fastify.addSchema({
     $id: 'File',
     type: 'object',
@@ -193,6 +206,7 @@ export const swaggerPlugin: any = async (
       proteins: { type: 'number' },
       fats: { type: 'number' },
       carbohydrates: { type: 'number' },
+      description: { type: 'string', nullable: true },
     },
   });
 
@@ -240,16 +254,102 @@ export const swaggerPlugin: any = async (
   });
 
   fastify.addSchema({
-    $id: 'MealEntry',
+    $id: 'Dish',
     type: 'object',
-    required: ['id', 'food', 'user', 'weight', 'userProgram', 'createdAt'],
+    required: ['id', 'title', 'status', 'createdAt', 'foods', 'user'],
     properties: {
       id: { type: 'number' },
-      food: { $ref: 'Food' },
-      user: { $ref: 'User' },
+      title: { type: 'string' },
+      status: {
+        type: 'string',
+        enum: [DishStatus.ACTIVE, DishStatus.CLOSE],
+      },
+      createdAt: { type: 'string' },
+      foods: {
+        type: 'array',
+        items: {
+          type: 'object',
+          required: [
+            'id',
+            'title',
+            'proteins',
+            'fats',
+            'carbohydrates',
+            'dishInfo',
+          ],
+          properties: {
+            id: { type: 'number' },
+            title: { type: 'string' },
+            proteins: { type: 'number' },
+            fats: { type: 'number' },
+            carbohydrates: { type: 'number' },
+            dishInfo: {
+              type: 'object',
+              required: ['weight'],
+              properties: {
+                weight: { type: 'number' },
+              },
+            },
+          },
+        },
+      },
+      user: {
+        $ref: 'SlimUser',
+      },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'DishMealEntry',
+    type: 'object',
+    required: [
+      'id',
+      'dish',
+      'user',
+      'weight',
+      'userProgram',
+      'createdAt',
+      'entryType',
+    ],
+    properties: {
+      id: { type: 'number' },
+      user: { $ref: 'SlimUser' },
       userProgram: { $ref: 'UserProgram' },
       weight: { type: 'number' },
       createdAt: { type: 'string' },
+      entryType: {
+        type: 'string',
+        value: 'dish',
+        enum: [MealEntryType.dish],
+      },
+      dish: { $ref: 'Dish' },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'FoodMealEntry',
+    type: 'object',
+    required: [
+      'id',
+      'food',
+      'user',
+      'weight',
+      'userProgram',
+      'createdAt',
+      'entryType',
+    ],
+    properties: {
+      id: { type: 'number' },
+      user: { $ref: 'SlimUser' },
+      userProgram: { $ref: 'UserProgram' },
+      weight: { type: 'number' },
+      createdAt: { type: 'string' },
+      entryType: {
+        type: 'string',
+        value: 'food',
+        enum: [MealEntryType.food],
+      },
+      food: { $ref: 'Food' },
     },
   });
 

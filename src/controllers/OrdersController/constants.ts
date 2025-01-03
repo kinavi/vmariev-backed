@@ -19,10 +19,12 @@ export const ORDER_INCLUDE_DATA = [
   {
     model: User,
     as: 'customer',
+    attributes: ['id', 'email']
   },
   {
     model: User,
     as: 'executor',
+    attributes: ['id', 'email']
   },
   {
     model: File,

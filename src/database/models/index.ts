@@ -12,6 +12,8 @@ import MealTimer from './mealTimer';
 import FoodUser from './foodUser';
 import UserProgram from './userProgram';
 import UserProgramMealEntry from './userProgramMealEntries';
+import Dish from './dish';
+import DishFoods from './dishFoods';
 
 UserProgram.belongsTo(User, {
   as: 'user',
@@ -29,15 +31,6 @@ MealEntry.belongsTo(User, {
   as: 'user',
   foreignKey: {
     name: 'userId',
-    allowNull: false,
-  },
-  foreignKeyConstraint: true,
-});
-
-MealEntry.belongsTo(Food, {
-  as: 'food',
-  foreignKey: {
-    name: 'foodId',
     allowNull: false,
   },
   foreignKeyConstraint: true,
@@ -167,6 +160,48 @@ UserRefreshToken.belongsTo(User, {
   foreignKeyConstraint: true,
 });
 
+Dish.belongsToMany(Food, {
+  through: 'DishFoods', // Название промежуточной таблицы
+  foreignKey: 'dishId',
+  otherKey: 'foodId',
+  as: 'foods', // Задаём алиас
+});
+
+Dish.belongsTo(User, {
+  as: 'user',
+  foreignKey: {
+    name: 'userId',
+    allowNull: false,
+  },
+  foreignKeyConstraint: true,
+});
+
+// Food has many MealEntries
+Food.hasMany(MealEntry, {
+  foreignKey: 'entryId',
+  constraints: false, // Отключаем ограничения внешнего ключа, так как он используется полиморфно
+  scope: { entryType: 'food' }, // Указываем, что для Food entryType = 'food'
+});
+
+MealEntry.belongsTo(Food, {
+  foreignKey: 'entryId',
+  constraints: false,
+  as: 'food',
+});
+
+// Dish has many MealEntries
+Dish.hasMany(MealEntry, {
+  foreignKey: 'entryId',
+  constraints: false,
+  scope: { entryType: 'dish' }, // Указываем, что для Dish entryType = 'dish'
+});
+
+MealEntry.belongsTo(Dish, {
+  foreignKey: 'entryId',
+  constraints: false,
+  as: 'dish',
+});
+
 export {
   Offer,
   Order,
@@ -181,4 +216,6 @@ export {
   MealTimer,
   FoodUser,
   UserProgram,
+  Dish,
+  DishFoods,
 };

@@ -49,6 +49,7 @@ export class OrdersController {
         {
           model: User,
           as: 'customer',
+          attributes: ['id', 'email'],
         },
         {
           model: File,
@@ -70,6 +71,7 @@ export class OrdersController {
         {
           model: User,
           as: 'customer',
+          attributes: ['id', 'email', 'login'],
         },
         {
           model: User,

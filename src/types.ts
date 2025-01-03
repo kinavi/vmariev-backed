@@ -12,6 +12,7 @@ import {
 import { TasksController } from './controllers/TasksController';
 import { TracksControler } from './controllers/TracksControler';
 import { MealEntriesController } from './controllers/MealsController';
+import { DishesController } from './controllers/DishesController';
 
 export type FastifyType = FastifyInstance & {
   controls: {
@@ -26,6 +27,7 @@ export type FastifyType = FastifyInstance & {
       food: FoodsController;
       userProgram: UserProgramController;
       mealsEntries: MealEntriesController;
+      dishes: DishesController;
     };
   };
   io: typeof socketioServer;

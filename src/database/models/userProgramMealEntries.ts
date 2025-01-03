@@ -9,7 +9,6 @@ export interface UserProgramMealEntryAttributes {
   deletedAt?: Date;
   createdAt?: Date;
 }
-
 class UserProgramMealEntry
   extends Model<UserProgramMealEntryAttributes>
   implements UserProgramMealEntryAttributes

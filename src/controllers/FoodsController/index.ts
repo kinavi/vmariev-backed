@@ -7,7 +7,14 @@ export class FoodsController {
       where: {
         id,
       },
-      attributes: ['id', 'title', 'proteins', 'fats', 'carbohydrates'],
+      attributes: [
+        'id',
+        'title',
+        'proteins',
+        'fats',
+        'carbohydrates',
+        'description',
+      ],
     });
     return result?.toJSON() || null;
   };
@@ -25,12 +32,13 @@ export class FoodsController {
   };
 
   create = async (data: FoodAttributes, userId: number) => {
-    const { carbohydrates, fats, proteins, title } = data;
+    const { carbohydrates, fats, proteins, title, description } = data;
     const result = await Food.create({
       title,
       proteins,
       fats,
       carbohydrates,
+      description,
     });
     await FoodUser.create({
       foodId: result.id,
@@ -41,7 +49,10 @@ export class FoodsController {
 
   update = async (
     id: number,
-    data: Pick<FoodAttributes, 'title' | 'proteins' | 'fats' | 'carbohydrates'>
+    data: Pick<
+      FoodAttributes,
+      'title' | 'proteins' | 'fats' | 'carbohydrates' | 'description'
+    >
   ) => {
     const [affectedCount] = await Food.update(data, { where: { id } });
     if (affectedCount > 0) {

@@ -1,8 +1,7 @@
-import { FastifyType, ResponceType, ResponseErrorType } from '../../types';
 import { NO_ACCESS_CODE_ERROR } from '../../constants';
-import { FoodAttributes } from '../../database/models/food';
+import { FastifyType, ResponceType, ResponseErrorType } from '../../types';
 
-export const foodsRoutes: any = async (
+export const dishesRoutes: any = async (
   fastify: FastifyType,
   options: any,
   done: any
@@ -10,9 +9,7 @@ export const foodsRoutes: any = async (
   fastify.post<{
     Body: {
       title: string;
-      proteins: number;
-      fats: number;
-      carbohydrates: number;
+      foods: { foodId: number; weight: number }[];
     };
   }>(
     '/saved',
@@ -23,11 +20,19 @@ export const foodsRoutes: any = async (
           type: 'object',
           properties: {
             title: { type: 'string' },
-            proteins: { type: 'number' },
-            fats: { type: 'number' },
-            carbohydrates: { type: 'number' },
+            foods: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  foodId: { type: 'number' },
+                  weight: { type: 'number' },
+                },
+                required: ['foodId', 'weight'],
+              },
+            },
           },
-          required: ['title', 'proteins', 'fats', 'carbohydrates'],
+          required: ['title', 'foods'],
         },
         response: {
           200: {
@@ -35,7 +40,7 @@ export const foodsRoutes: any = async (
             properties: {
               status: { type: 'string', enum: ['ok'] },
               data: {
-                $ref: 'Food',
+                $ref: 'Dish',
               },
             },
             required: ['status', 'data'],
@@ -53,22 +58,59 @@ export const foodsRoutes: any = async (
       },
     },
     async (request, reply) => {
-      const {
-        body: { carbohydrates, fats, proteins, title },
-      } = request;
+      const body = request.body;
       const userId = request.user?.id;
       if (!userId) {
         throw new Error(NO_ACCESS_CODE_ERROR);
       }
-      const food = await fastify.controls.glutton.food.create(
-        {
-          carbohydrates,
-          fats,
-          proteins,
-          title,
+      const result = await fastify.controls.glutton.dishes.create({
+        ...body,
+        userId,
+      });
+      const responce: ResponceType = {
+        status: 'ok',
+        data: result,
+      };
+      console.log('responce', responce);
+      reply.send(responce);
+    }
+  );
+
+  fastify.get(
+    '/saved',
+    {
+      schema: {
+        tags: ['Glutton'],
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['ok'] },
+              data: {
+                type: 'array',
+                items: { $ref: 'Dish' },
+              },
+            },
+            required: ['status', 'data'],
+          },
+          240: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status', 'message'],
+          },
         },
-        userId
-      );
+      },
+    },
+    async (request, reply) => {
+      const userId = request.user?.id;
+      if (!userId) {
+        throw new Error(NO_ACCESS_CODE_ERROR);
+      }
+      const food = await fastify.controls.glutton.dishes.getByUser(userId);
       const responce: ResponceType = {
         status: 'ok',
         data: food,
@@ -77,8 +119,61 @@ export const foodsRoutes: any = async (
     }
   );
 
+  fastify.get<{ Params: { id: number } }>(
+    '/saved/:id',
+    {
+      schema: {
+        tags: ['Glutton'],
+        params: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+          },
+          required: ['id'],
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['ok'] },
+              data: { $ref: 'Dish' },
+            },
+            required: ['status'],
+          },
+          240: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['error'] },
+              field: { type: 'string' },
+              message: { type: 'string' },
+            },
+            required: ['status', 'message'],
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const {
+        params: { id },
+      } = request;
+      const userId = request.user?.id;
+      if (!userId) {
+        throw new Error(NO_ACCESS_CODE_ERROR);
+      }
+      const result = await fastify.controls.glutton.dishes.get(id);
+      const responce: ResponceType = {
+        status: 'ok',
+        data: result,
+      };
+      reply.send(responce);
+    }
+  );
+
   fastify.put<{
-    Body: Pick<FoodAttributes, 'carbohydrates' | 'fats' | 'proteins' | 'title'>;
+    Body: {
+      title: string;
+      foods: { foodId: number; weight: number }[];
+    };
     Params: { id: string };
   }>(
     '/saved/:id',
@@ -96,11 +191,19 @@ export const foodsRoutes: any = async (
           type: 'object',
           properties: {
             title: { type: 'string' },
-            proteins: { type: 'number' },
-            fats: { type: 'number' },
-            carbohydrates: { type: 'number' },
+            foods: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  foodId: { type: 'number' },
+                  weight: { type: 'number' },
+                },
+                required: ['foodId', 'weight'],
+              },
+            },
           },
-          required: ['title', 'proteins', 'fats', 'carbohydrates'],
+          required: ['title', 'foods'],
         },
         response: {
           200: {
@@ -108,7 +211,7 @@ export const foodsRoutes: any = async (
             properties: {
               status: { type: 'string', enum: ['ok'] },
               data: {
-                $ref: 'Food',
+                $ref: 'Dish',
               },
             },
             required: ['status', 'data'],
@@ -127,30 +230,28 @@ export const foodsRoutes: any = async (
     },
     async (request, reply) => {
       const {
-        body: { carbohydrates, fats, proteins, title },
+        body: { foods, title },
         params: { id },
       } = request;
       const userId = request.user?.id;
       if (!userId) {
         throw new Error(NO_ACCESS_CODE_ERROR);
       }
-      const food = await fastify.controls.glutton.food.update(Number(id), {
-        carbohydrates,
-        fats,
-        proteins,
+      const dish = await fastify.controls.glutton.dishes.update(Number(id), {
         title,
+        foods,
       });
-      if (!food) {
+      if (!dish) {
         const responce: ResponseErrorType = {
           status: 'error',
-          message: 'food has not found',
+          message: 'dish has not found',
         };
         reply.code(240).send(responce);
         return;
       }
       const responce: ResponceType = {
         status: 'ok',
-        data: food,
+        data: dish,
       };
       reply.send(responce);
     }
@@ -198,7 +299,9 @@ export const foodsRoutes: any = async (
       if (!userId) {
         throw new Error(NO_ACCESS_CODE_ERROR);
       }
-      const isSuccess = await fastify.controls.glutton.food.remove(Number(id));
+      const isSuccess = await fastify.controls.glutton.dishes.remove(
+        Number(id)
+      );
       if (!isSuccess) {
         const responce: ResponseErrorType = {
           status: 'error',
@@ -209,100 +312,6 @@ export const foodsRoutes: any = async (
       }
       const responce: ResponceType = {
         status: 'ok',
-      };
-      reply.send(responce);
-    }
-  );
-
-  fastify.get<{ Params: { id: number } }>(
-    '/saved/:id',
-    {
-      schema: {
-        tags: ['Glutton'],
-        params: {
-          type: 'object',
-          properties: {
-            id: { type: 'number' },
-          },
-          required: ['id'],
-        },
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              status: { type: 'string', enum: ['ok'] },
-              data: { $ref: 'Food' },
-            },
-            required: ['status'],
-          },
-          240: {
-            type: 'object',
-            properties: {
-              status: { type: 'string', enum: ['error'] },
-              field: { type: 'string' },
-              message: { type: 'string' },
-            },
-            required: ['status', 'message'],
-          },
-        },
-      },
-    },
-    async (request, reply) => {
-      const {
-        params: { id },
-      } = request;
-      const userId = request.user?.id;
-      if (!userId) {
-        throw new Error(NO_ACCESS_CODE_ERROR);
-      }
-      const food = await fastify.controls.glutton.food.get(id);
-      console.log('food', food);
-      const responce: ResponceType = {
-        status: 'ok',
-        data: food,
-      };
-      reply.send(responce);
-    }
-  );
-
-  fastify.get(
-    '/saved',
-    {
-      schema: {
-        tags: ['Glutton'],
-        response: {
-          200: {
-            type: 'object',
-            properties: {
-              status: { type: 'string', enum: ['ok'] },
-              data: {
-                type: 'array',
-                items: { $ref: 'Food' },
-              },
-            },
-            required: ['status', 'data'],
-          },
-          240: {
-            type: 'object',
-            properties: {
-              status: { type: 'string', enum: ['error'] },
-              field: { type: 'string' },
-              message: { type: 'string' },
-            },
-            required: ['status', 'message'],
-          },
-        },
-      },
-    },
-    async (request, reply) => {
-      const userId = request.user?.id;
-      if (!userId) {
-        throw new Error(NO_ACCESS_CODE_ERROR);
-      }
-      const food = await fastify.controls.glutton.food.getByUser(userId);
-      const responce: ResponceType = {
-        status: 'ok',
-        data: food,
       };
       reply.send(responce);
     }

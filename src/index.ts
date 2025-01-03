@@ -20,6 +20,7 @@ import { TasksController } from './controllers/TasksController';
 import { TracksControler } from './controllers/TracksControler';
 import { FastifyType } from './types';
 import { MealEntriesController } from './controllers/MealsController';
+import { DishesController } from './controllers/DishesController';
 
 export const upload = multer({ dest: 'uploads/' });
 
@@ -77,6 +78,7 @@ export class Server {
         food: new FoodsController(),
         userProgram: new UserProgramController(),
         mealsEntries: new MealEntriesController(),
+        dishes: new DishesController(),
       },
     } as FastifyType['controls']);
     this.fastify.register(swaggerPlugin);

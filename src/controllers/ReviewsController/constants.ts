@@ -7,5 +7,6 @@ export const REVIEWS_INCLUDES = [
   {
     model: User,
     as: 'user',
+    attributes: ['id', 'login'],
   },
 ];

@@ -42,6 +42,7 @@ export class UserProgramController {
         'ratioFats',
         'isExcludeActivity',
       ],
+      order: [['createdAt', 'DESC']], // Сортируем по дате создания в порядке убывания
     });
     return result?.toJSON();
   };

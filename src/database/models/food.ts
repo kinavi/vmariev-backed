@@ -7,6 +7,7 @@ export interface FoodAttributes {
   proteins: number;
   fats: number;
   carbohydrates: number;
+  description?: string;
 
   updatedAt?: Date;
   deletedAt?: Date;
@@ -19,6 +20,7 @@ class Food extends Model<FoodAttributes> implements FoodAttributes {
   public proteins!: number;
   public fats!: number;
   public carbohydrates!: number;
+  public description!: string;
 
   public readonly updatedAt!: Date;
   public readonly createdAt!: Date;
@@ -30,6 +32,7 @@ Food.init(
     proteins: DataTypes.FLOAT,
     fats: DataTypes.FLOAT,
     carbohydrates: DataTypes.FLOAT,
+    description: DataTypes.STRING,
   },
   {
     sequelize: connection,

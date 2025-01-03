@@ -1,5 +1,5 @@
 import { MealAttributes } from '../../database/models/mealEntrie';
-import { Meal, Food, User, UserProgram } from '../../database/models';
+import { Meal, Food, User, UserProgram, Dish } from '../../database/models';
 import { Op } from 'sequelize';
 
 export class MealEntriesController {
@@ -8,15 +8,38 @@ export class MealEntriesController {
       where: {
         id,
       },
-      attributes: ['id', 'weight', 'createdAt'],
+      attributes: ['id', 'weight', 'createdAt', 'entryType'],
       include: [
+        { model: Food, as: 'food' },
         {
-          model: Food,
-          as: 'food',
+          model: Dish,
+          as: 'dish',
+          attributes: ['id', 'title', 'status', 'createdAt'],
+          include: [
+            {
+              model: Food,
+              as: 'foods',
+              through: {
+                attributes: ['weight'],
+                as: 'dishInfo',
+              },
+              attributes: ['id', 'title', 'proteins', 'fats', 'carbohydrates'],
+            },
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'email'],
+            },
+          ],
         },
         {
           model: User,
           as: 'user',
+          attributes: ['id', 'email'],
+        },
+        {
+          model: UserProgram,
+          as: 'userProgram',
         },
       ],
     });
@@ -36,15 +59,34 @@ export class MealEntriesController {
           [Op.lt]: dateEnd,
         },
       },
-      attributes: ['id', 'weight', 'createdAt'],
+      attributes: ['id', 'weight', 'createdAt', 'entryType'],
       include: [
+        { model: Food, as: 'food' },
         {
-          model: Food,
-          as: 'food',
+          model: Dish,
+          as: 'dish',
+          attributes: ['id', 'title', 'status', 'createdAt'],
+          include: [
+            {
+              model: Food,
+              as: 'foods',
+              through: {
+                attributes: ['weight'],
+                as: 'dishInfo',
+              },
+              attributes: ['id', 'title', 'proteins', 'fats', 'carbohydrates'],
+            },
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'email'],
+            },
+          ],
         },
         {
           model: User,
           as: 'user',
+          attributes: ['id', 'email'],
         },
         {
           model: UserProgram,
@@ -56,19 +98,20 @@ export class MealEntriesController {
   };
 
   create = async (data: MealAttributes) => {
-    const { foodId, weight, userId, userProgramId } = data;
+    const { weight, userId, userProgramId, entryId, entryType } = data;
     const result = await Meal.create({
-      foodId,
+      entryId,
       weight,
       userId,
       userProgramId,
+      entryType,
     });
     return this.get(result.id);
   };
 
   update = async (
     id: number,
-    data: Pick<MealAttributes, 'weight' | 'foodId'>
+    data: Pick<MealAttributes, 'weight' | 'entryId' | 'entryType'>
   ) => {
     const [affectedCount] = await Meal.update(data, { where: { id } });
     if (affectedCount > 0) {
