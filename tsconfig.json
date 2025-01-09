@@ -5,7 +5,7 @@
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
-    "module": "Node16",
+    "module": "NodeNext",
     "noImplicitAny": true,
     "resolveJsonModule": true,
     "noImplicitReturns": false,
@@ -13,7 +13,7 @@
     "noUnusedLocals": false,
     "strictNullChecks": true,
     "pretty": true,
-    "types": [ "node", "@types/jest"],
+    "types": [ "node"],
     "target": "es6",
     "outDir": "build",
     "rootDir": "src/",  
@@ -23,7 +23,7 @@
     "forceConsistentCasingInFileNames": true,            /* Ensure that casing is correct in imports. */
     "strict": true,   
     "skipLibCheck": true,                              /* Skip type checking all .d.ts files. */
-    "typeRoots": ["./src/typings", "../../node_modules/@types"]
+    "typeRoots": ["./src/typings", "node_modules/@types"]
   },
   "include": ["./**/*.ts", "src/routs/schema.js"],
   "exclude": ["node_modules", "build", "dist", "**/*.spec.ts", "**/*.test.ts", "**/tests/*", "src/helper.ts"]
