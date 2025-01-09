@@ -1,8 +1,11 @@
-import { NO_ACCESS_CODE_ERROR, UNAUTHORIZED_CODE_ERROR } from '../constants';
+import {
+  LOGIN_TIME_OUT_CODE_ERROR,
+  NO_ACCESS_CODE_ERROR,
+  UNAUTHORIZED_CODE_ERROR,
+} from '../constants';
 import { FastifyType, UserRole } from '../types';
 
 export const tokenVerification = (fastify: FastifyType) => {
-  fastify.decorateRequest('user', null);
   fastify.addHook('preHandler', async (request, reply) => {
     try {
       const authorization = request.headers.authorization;
@@ -12,8 +15,15 @@ export const tokenVerification = (fastify: FastifyType) => {
         throw new Error(UNAUTHORIZED_CODE_ERROR);
       }
       request.user = user;
-    } catch (error) {
-      throw new Error(UNAUTHORIZED_CODE_ERROR);
+    } catch (error: any) {
+      fastify.log.error(error);
+      const name = error['name'];
+      switch (name) {
+        case 'TokenExpiredError':
+          throw new Error(LOGIN_TIME_OUT_CODE_ERROR);
+        default:
+          throw new Error(UNAUTHORIZED_CODE_ERROR);
+      }
     }
   });
 };

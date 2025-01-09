@@ -43,7 +43,7 @@ require('dotenv').config();
 export class Server {
   private port;
 
-  fastify: ReturnType<typeof Fastify>;
+  fastify;
 
   constructor(port: number) {
     this.port = port;
@@ -65,6 +65,11 @@ export class Server {
           pass: process.env.MAILER_PASSWORD,
         },
       },
+    });
+    this.fastify.register(require('@fastify/cookie'), {
+      secret: process.env.COOKIE_SECRET,
+      hook: 'onRequest', // set to false to disable cookie autoparsing or set autoparsing on any of the following hooks: 'onRequest', 'preParsing', 'preHandler', 'preValidation'. default: 'onRequest'
+      parseOptions: {}, // options for parsing cookies
     });
     this.fastify.decorate('controls', {
       orders: new OrdersController(),

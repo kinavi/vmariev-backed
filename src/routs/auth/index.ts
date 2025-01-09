@@ -5,12 +5,22 @@ import {
   ResponceType,
   UserRole,
 } from '../../types';
+import sha256 from 'crypto-js/sha256';
 
 interface ICreateUserBody {
   password: string;
   code: number;
   email: string;
 }
+function encodeObject(obj: any) {
+  return sha256(JSON.stringify(obj));
+}
+
+async function decodeObject(token: string) {}
+
+const encodeDeviceId = (data: { ip: string; userAgent: string }) => {
+  return encodeObject(data).toString();
+};
 
 export const authRoutes: any = async (fastify: FastifyType, options: any) => {
   fastify.post<{ Body: ICreateUserBody }>(
@@ -96,9 +106,15 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
         if (offer.id) {
           await fastify.controls.offers.confirm(offer.id);
         }
+        const userAgent = request.headers['user-agent'] || 'no-agent';
+        const deviceId = await encodeDeviceId({
+          ip: request.ip,
+          userAgent,
+        });
         const result = await fastify.controls.users.createToken(
           email,
-          password
+          password,
+          deviceId
         );
         const responce: ResponceType = {
           status: 'ok',
@@ -160,9 +176,16 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
     async (request, reply) => {
       try {
         const { email, password } = request.body;
+        const userAgent = request.headers['user-agent'] || 'no-agent';
+        const deviceId = await encodeDeviceId({
+          ip: request.ip,
+          userAgent,
+        });
+        fastify.log.info('deviceId', deviceId);
         const result = await fastify.controls.users.createToken(
           email,
-          password
+          password,
+          deviceId
         );
         const responce = {
           status: 'ok',
@@ -241,9 +264,16 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
         throw new Error(UNAUTHORIZED_CODE_ERROR);
       }
 
-      const result = await fastify.controls.users.createToken(
+      const userAgent = request.headers['user-agent'] || 'no-agent';
+
+      const deviceId = await encodeDeviceId({
+        ip: request.ip,
+        userAgent,
+      });
+
+      const result = await fastify.controls.users.refreshTokens(
         email,
-        data.password
+        deviceId
       );
 
       const responce = {

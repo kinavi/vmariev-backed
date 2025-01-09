@@ -6,7 +6,6 @@ import {
 import { FastifyType, UserRole } from '../types';
 
 export const adminVerification = (fastify: FastifyType) => {
-  fastify.decorateRequest('user', null);
   fastify.addHook('preHandler', async (request, reply) => {
     const authorization = request.headers.authorization;
     if (!authorization) {
