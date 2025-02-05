@@ -49,22 +49,36 @@ export class Server {
     this.port = port;
     this.fastify = Fastify({
       logger: envToLogger.development ?? true,
-      https: {
-        key: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.key')),
-        cert: readFileSync(path.join(__dirname, '..', 'https', 'vmariev.cert')),
-      },
+      https:
+        process.env.NODE_ENV !== 'development'
+          ? {
+              key: readFileSync(
+                path.join(__dirname, '..', 'https', 'vmariev.key')
+              ),
+              cert: readFileSync(
+                path.join(__dirname, '..', 'https', 'vmariev.cert')
+              ),
+            }
+          : null,
     });
-    this.fastify.register(require('fastify-mailer'), {
-      defaults: { from: `vmariev <${process.env.MAILER_LOGIN}>` },
-      transport: {
-        host: process.env.MAILER_HOST,
-        port: 465,
-        secure: true, // use TLS
-        auth: {
-          user: process.env.MAILER_LOGIN,
-          pass: process.env.MAILER_PASSWORD,
+    if (process.env.NODE_ENV !== 'development') {
+      this.fastify.register(require('fastify-mailer'), {
+        defaults: { from: `vmariev <${process.env.MAILER_LOGIN}>` },
+        transport: {
+          host: process.env.MAILER_HOST,
+          port: 465,
+          secure: true, // use TLS
+          auth: {
+            user: process.env.MAILER_LOGIN,
+            pass: process.env.MAILER_PASSWORD,
+          },
         },
-      },
+      });
+    }
+    this.fastify.register(cors, {
+      origin: process.env.FRONTED_HOST,
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      credentials: true, // Разрешает куки
     });
     this.fastify.register(require('@fastify/cookie'), {
       secret: process.env.COOKIE_SECRET,
@@ -106,10 +120,7 @@ export class Server {
         methods: ['GET', 'POST'],
       },
     });
-    this.fastify.register(cors, {
-      origin: '*',
-      methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    });
+
     this.fastify.ready((error) => {
       this.fastify.io.on('connection', (socket) =>
         console.info('Socket connected!', socket.id)

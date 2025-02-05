@@ -1,4 +1,4 @@
-import { NO_ACCESS_CODE_ERROR, UNAUTHORIZED_CODE_ERROR } from '../../constants';
+import { UNAUTHORIZED_CODE_ERROR } from '../../constants';
 import {
   ResponseErrorType,
   FastifyType,
@@ -6,20 +6,35 @@ import {
   UserRole,
 } from '../../types';
 import sha256 from 'crypto-js/sha256';
+import cookie from '@fastify/cookie';
+
+require('dotenv').config();
 
 interface ICreateUserBody {
   password: string;
   code: number;
   email: string;
 }
+
 function encodeObject(obj: any) {
   return sha256(JSON.stringify(obj));
 }
 
+const COOKI_NAME = 'vm_device_id';
+
 async function decodeObject(token: string) {}
 
-const encodeDeviceId = (data: { ip: string; userAgent: string }) => {
+const encodeDeviceId = (data: { ip: string; userAgent: string | null }) => {
   return encodeObject(data).toString();
+};
+
+const createDeviceIdCookie = (deviceId: string) => {
+  return cookie.serialize(COOKI_NAME, deviceId, {
+    maxAge: Number(process.env.MAX_AGE_COOKIE_SECONDS),
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV !== 'development' ? true : false,
+  });
 };
 
 export const authRoutes: any = async (fastify: FastifyType, options: any) => {
@@ -111,15 +126,20 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           ip: request.ip,
           userAgent,
         });
+
         const result = await fastify.controls.users.createToken(
           email,
           password,
           deviceId
         );
+
         const responce: ResponceType = {
           status: 'ok',
           data: result,
         };
+
+        const _cookie = createDeviceIdCookie(deviceId);
+        reply.header('set-cookie', _cookie);
         reply.send(responce);
       } catch (error: any) {
         if ('status' in error) {
@@ -176,12 +196,12 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
     async (request, reply) => {
       try {
         const { email, password } = request.body;
-        const userAgent = request.headers['user-agent'] || 'no-agent';
+        const userAgent = request.headers['user-agent'] || null;
         const deviceId = await encodeDeviceId({
           ip: request.ip,
           userAgent,
         });
-        fastify.log.info('deviceId', deviceId);
+        fastify.log.info(COOKI_NAME, deviceId);
         const result = await fastify.controls.users.createToken(
           email,
           password,
@@ -191,6 +211,8 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           status: 'ok',
           data: result,
         };
+        const _cookie = createDeviceIdCookie(deviceId);
+        reply.header('set-cookie', _cookie);
         reply.send(responce);
       } catch (error: any) {
         if ('status' in error) {
@@ -248,8 +270,15 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
     async (request, reply) => {
       const { email, refresh_token } = request.body;
 
+      const deviceIdFromCookies = request.cookies[COOKI_NAME];
+
+      if (!deviceIdFromCookies) {
+        throw new Error(UNAUTHORIZED_CODE_ERROR);
+      }
+
       const isValid = await fastify.controls.users.checkRefreshToken(
-        refresh_token
+        refresh_token,
+        deviceIdFromCookies
       );
 
       if (!isValid) {
@@ -266,20 +295,23 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
 
       const userAgent = request.headers['user-agent'] || 'no-agent';
 
-      const deviceId = await encodeDeviceId({
+      const updatedDeviceId = await encodeDeviceId({
         ip: request.ip,
         userAgent,
       });
 
       const result = await fastify.controls.users.refreshTokens(
         email,
-        deviceId
+        updatedDeviceId
       );
 
       const responce = {
         status: 'ok',
         data: result,
       };
+
+      const updatedCookie = createDeviceIdCookie(updatedDeviceId);
+      reply.header('set-cookie', updatedCookie);
       reply.send(responce);
     }
   );

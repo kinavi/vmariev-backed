@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "nodemon ./src/index.ts",
-    "start": "ts-node ./src/index.ts",
+    "dev": "export NODE_ENV=development && nodemon ./src/index.ts",
+    "start": "export NODE_ENV=development && ts-node ./src/index.ts",
     "test": "jest",
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",

@@ -207,7 +207,7 @@ export class UsersController {
     };
   };
 
-  checkRefreshToken = async (token: string) => {
+  checkRefreshToken = async (token: string, deviceId: string) => {
     try {
       const payload = await this.getRefreshTokenPayload(token);
       if (!payload) {
@@ -216,7 +216,7 @@ export class UsersController {
       const result = (await UserRefreshToken.findOne({
         where: {
           userId: payload['user_id'],
-          deviceId: payload['device_id'],
+          deviceId: deviceId,
           refreshToken: token,
         },
         include: [

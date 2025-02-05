@@ -37,6 +37,9 @@ export type FastifyType = FastifyInstance & {
       callback: (error: any, info: { from: string; to: string }) => void
     ) => void;
   };
+  cookies: {
+    [key: string]: any;
+  };
 };
 
 export type ResponseErrorType = {
