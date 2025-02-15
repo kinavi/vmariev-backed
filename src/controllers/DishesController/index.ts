@@ -29,11 +29,13 @@ export class DishesController {
     return result?.toJSON();
   };
 
-  getByUser = async (userId: number) => {
+  getByUser = async (userId: number, status?: DishStatus) => {
+    const where: { [key: string]: string | number } = { userId };
+    if (status) {
+      where['status'] = status;
+    }
     const dishesByuser = await Dish.findAll({
-      where: {
-        userId,
-      },
+      where,
     });
     const result = await Promise.all(
       dishesByuser.map((item) => this.get(item.id))
@@ -75,19 +77,21 @@ export class DishesController {
     data: {
       title: string;
       foods: { foodId: number; weight: number }[];
+      status?: DishStatus;
     }
   ) => {
+    const updatedData: any = {
+      title: data.title,
+    };
+    if (data.status) {
+      updatedData['status'] = data.status;
+    }
     await this.removeFoodLinks(id);
-    await Dish.update(
-      {
-        title: data.title,
+    await Dish.update(updatedData, {
+      where: {
+        id,
       },
-      {
-        where: {
-          id,
-        },
-      }
-    );
+    });
     try {
       await Promise.all(
         data.foods.map((item) => {

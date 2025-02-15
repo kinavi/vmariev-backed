@@ -1,4 +1,5 @@
 import { NO_ACCESS_CODE_ERROR } from '../../constants';
+import { DishStatus } from '../../database/models/dish';
 import { FastifyType, ResponceType, ResponseErrorType } from '../../types';
 
 export const dishesRoutes: any = async (
@@ -10,6 +11,7 @@ export const dishesRoutes: any = async (
     Body: {
       title: string;
       foods: { foodId: number; weight: number }[];
+      status?: DishStatus;
     };
   }>(
     '/saved',
@@ -30,6 +32,10 @@ export const dishesRoutes: any = async (
                 },
                 required: ['foodId', 'weight'],
               },
+            },
+            status: {
+              type: 'string',
+              enum: [DishStatus.ACTIVE, DishStatus.CLOSE],
             },
           },
           required: ['title', 'foods'],
@@ -76,11 +82,22 @@ export const dishesRoutes: any = async (
     }
   );
 
-  fastify.get(
+  fastify.get<{
+    Querystring: { status?: DishStatus };
+  }>(
     '/saved',
     {
       schema: {
         tags: ['Glutton'],
+        querystring: {
+          type: 'object',
+          properties: {
+            status: {
+              type: 'string',
+              enum: [DishStatus.ACTIVE, DishStatus.CLOSE],
+            },
+          },
+        },
         response: {
           200: {
             type: 'object',
@@ -106,11 +123,15 @@ export const dishesRoutes: any = async (
       },
     },
     async (request, reply) => {
+      const { status } = request.query;
       const userId = request.user?.id;
       if (!userId) {
         throw new Error(NO_ACCESS_CODE_ERROR);
       }
-      const food = await fastify.controls.glutton.dishes.getByUser(userId);
+      const food = await fastify.controls.glutton.dishes.getByUser(
+        userId,
+        status
+      );
       const responce: ResponceType = {
         status: 'ok',
         data: food,
@@ -173,6 +194,7 @@ export const dishesRoutes: any = async (
     Body: {
       title: string;
       foods: { foodId: number; weight: number }[];
+      status?: DishStatus;
     };
     Params: { id: string };
   }>(
@@ -202,6 +224,10 @@ export const dishesRoutes: any = async (
                 required: ['foodId', 'weight'],
               },
             },
+            status: {
+              type: 'string',
+              enum: [DishStatus.ACTIVE, DishStatus.CLOSE],
+            },
           },
           required: ['title', 'foods'],
         },
@@ -230,7 +256,7 @@ export const dishesRoutes: any = async (
     },
     async (request, reply) => {
       const {
-        body: { foods, title },
+        body: { foods, title, status },
         params: { id },
       } = request;
       const userId = request.user?.id;
@@ -240,6 +266,7 @@ export const dishesRoutes: any = async (
       const dish = await fastify.controls.glutton.dishes.update(Number(id), {
         title,
         foods,
+        status,
       });
       if (!dish) {
         const responce: ResponseErrorType = {
