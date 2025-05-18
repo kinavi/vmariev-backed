@@ -19,6 +19,7 @@ export class UserProgramController {
         'ratioProteins',
         'ratioFats',
         'isExcludeActivity',
+        'isPersonalizedRatioSettings',
       ],
     });
     return result?.toJSON();
@@ -41,6 +42,7 @@ export class UserProgramController {
         'ratioProteins',
         'ratioFats',
         'isExcludeActivity',
+        'isPersonalizedRatioSettings',
       ],
       order: [['createdAt', 'DESC']], // Сортируем по дате создания в порядке убывания
     });
@@ -64,6 +66,7 @@ export class UserProgramController {
         'ratioProteins',
         'ratioFats',
         'isExcludeActivity',
+        'isPersonalizedRatioSettings',
       ],
     });
     return !!result;
@@ -82,6 +85,7 @@ export class UserProgramController {
       ratioFats,
       ratioProteins,
       isExcludeActivity,
+      isPersonalizedRatioSettings,
     } = data;
     const result = await UserProgram.create({
       userId,
@@ -95,6 +99,7 @@ export class UserProgramController {
       ratioFats,
       ratioProteins,
       isExcludeActivity,
+      isPersonalizedRatioSettings,
     });
     return this.get(result.id);
   };
@@ -110,6 +115,7 @@ export class UserProgramController {
       | 'height'
       | 'weight'
       | 'isExcludeActivity'
+      | 'isPersonalizedRatioSettings'
     >
   ) => {
     const [affectedCount] = await UserProgram.update(data, { where: { id } });

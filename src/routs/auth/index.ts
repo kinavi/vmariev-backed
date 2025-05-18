@@ -1,3 +1,4 @@
+import isAfter from 'date-fns/isAfter';
 import { UNAUTHORIZED_CODE_ERROR } from '../../constants';
 import {
   ResponseErrorType,
@@ -5,37 +6,10 @@ import {
   ResponceType,
   UserRole,
 } from '../../types';
-import sha256 from 'crypto-js/sha256';
-import cookie from '@fastify/cookie';
+import { COOKI_NAME, createDeviceIdCookie, encodeDeviceId } from './cookies';
+import { ICreateUserBody } from './types';
 
 require('dotenv').config();
-
-interface ICreateUserBody {
-  password: string;
-  code: number;
-  email: string;
-}
-
-function encodeObject(obj: any) {
-  return sha256(JSON.stringify(obj));
-}
-
-const COOKI_NAME = 'vm_device_id';
-
-async function decodeObject(token: string) {}
-
-const encodeDeviceId = (data: { ip: string; userAgent: string | null }) => {
-  return encodeObject(data).toString();
-};
-
-const createDeviceIdCookie = (deviceId: string) => {
-  return cookie.serialize(COOKI_NAME, deviceId, {
-    maxAge: Number(process.env.MAX_AGE_COOKIE_SECONDS),
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV !== 'development' ? true : false,
-  });
-};
 
 export const authRoutes: any = async (fastify: FastifyType, options: any) => {
   fastify.post<{ Body: ICreateUserBody }>(
@@ -76,12 +50,15 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
             },
             required: ['status', 'data'],
           },
-          250: {
+          240: {
             type: 'object',
             properties: {
               status: { type: 'string', enum: ['error'] },
               field: { type: 'string' },
-              message: { type: 'string' },
+              message: {
+                type: 'string',
+                enum: ['offerOrCodeNotValid', 'lifeTimeOfferIsExpired'],
+              },
             },
             required: ['status', 'message'],
           },
@@ -97,18 +74,26 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
           const error: ResponceType & ResponseErrorType = {
             status: 'error',
             field: 'code',
-            message: 'not has offer or offer not confirm',
+            message: 'offerOrCodeNotValid',
           };
-          reply.code(250).send(error);
+          reply.code(240).send(error);
           return;
         }
         if (user) {
           const error: ResponceType & ResponseErrorType = {
             status: 'error',
-            field: 'email',
-            message: 'email is busy',
+            message: 'offerOrCodeNotValid',
           };
-          reply.code(250).send(error);
+          reply.code(240).send(error);
+          return;
+        }
+        if (!!offer && !isAfter(new Date(offer.lifeDate), new Date())) {
+          const error: ResponceType & ResponseErrorType = {
+            status: 'error',
+            field: 'code',
+            message: 'lifeTimeOfferIsExpired',
+          };
+          reply.code(240).send(error);
           return;
         }
         await fastify.controls.users.create({
@@ -143,7 +128,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
         reply.send(responce);
       } catch (error: any) {
         if ('status' in error) {
-          reply.code(250).send(error);
+          reply.code(240).send(error);
         } else {
           reply.code(500).send(error);
         }
@@ -181,7 +166,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
             },
             required: ['status', 'data'],
           },
-          400: {
+          240: {
             type: 'object',
             properties: {
               status: { type: 'string', enum: ['error'] },
@@ -216,7 +201,7 @@ export const authRoutes: any = async (fastify: FastifyType, options: any) => {
         reply.send(responce);
       } catch (error: any) {
         if ('status' in error) {
-          reply.code(400).send(error);
+          reply.code(240).send(error);
         } else {
           reply.code(500).send(error);
         }

@@ -13,8 +13,10 @@ import { TasksController } from './controllers/TasksController';
 import { TracksControler } from './controllers/TracksControler';
 import { MealEntriesController } from './controllers/MealsController';
 import { DishesController } from './controllers/DishesController';
+import { UserActivityEntriesController } from './controllers/UserActivityEntriesController';
+import { BaseCurrencyUserController } from './controllers/BaseCurrencyUserController';
 
-export type FastifyType = FastifyInstance & {
+type PluginsType = {
   controls: {
     users: UsersController;
     offers: OffersController;
@@ -28,6 +30,10 @@ export type FastifyType = FastifyInstance & {
       userProgram: UserProgramController;
       mealsEntries: MealEntriesController;
       dishes: DishesController;
+      userActivityEntries: UserActivityEntriesController;
+    };
+    coins: {
+      baseCurrencySetting: BaseCurrencyUserController;
     };
   };
   io: typeof socketioServer;
@@ -41,6 +47,8 @@ export type FastifyType = FastifyInstance & {
     [key: string]: any;
   };
 };
+
+export type FastifyType = FastifyInstance & PluginsType;
 
 export type ResponseErrorType = {
   status: 'error';

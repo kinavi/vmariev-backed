@@ -13,7 +13,7 @@
     "noUnusedLocals": false,
     "strictNullChecks": true,
     "pretty": true,
-    "types": [ "node"],
+    "types": ["node", "jest"],
     "target": "es6",
     "outDir": "build",
     "rootDir": "src/",  

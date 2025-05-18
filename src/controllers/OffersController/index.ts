@@ -1,10 +1,12 @@
 import addDays from 'date-fns/addDays';
 import { Offer } from '../../database/models';
+import addSeconds from 'date-fns/addSeconds';
 
 export class OffersController {
   create = async (email: string, phone: string) => {
+    const lifeDateSeconds = Number(process.env.LIFE_TIME_OFFER_SECOMDS);
     const code = Math.round(Math.random() * 100000);
-    const lifeDate = addDays(new Date(), 1);
+    const lifeDate = addSeconds(new Date(), lifeDateSeconds || 0);
     await Offer.create({
       code,
       email,

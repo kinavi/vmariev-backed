@@ -10,6 +10,8 @@ import {
 } from '../database/models/userProgram';
 import { DishStatus } from '../database/models/dish';
 import { MealEntryType } from '../database/models/mealEntrie';
+import { CoinTransactionType } from '../database/models/coinTransaction';
+import { CoinPlannedTransactionStatusType } from '../database/models/coinPlannedTransaction';
 
 export const swaggerPlugin: any = async (
   fastify: FastifyType,
@@ -44,6 +46,7 @@ export const swaggerPlugin: any = async (
 
   fastify.addSchema({
     $id: 'User',
+    title: 'User',
     type: 'object',
     required: ['id', 'email', 'login', 'phone', 'role'],
     properties: {
@@ -54,13 +57,12 @@ export const swaggerPlugin: any = async (
       role: {
         type: 'string',
       },
-      createdAt: { type: 'string' },
-      updatedAt: { type: 'string' },
     },
   });
 
   fastify.addSchema({
     $id: 'SlimUser',
+    title: 'SlimUser',
     type: 'object',
     required: ['id', 'email'],
     properties: {
@@ -106,6 +108,7 @@ export const swaggerPlugin: any = async (
   });
   fastify.addSchema({
     $id: 'Review',
+    title: 'Review',
     type: 'object',
     required: ['id', 'text'],
     properties: {
@@ -121,6 +124,7 @@ export const swaggerPlugin: any = async (
   });
   fastify.addSchema({
     $id: 'Order',
+    title: 'Order',
     type: 'object',
     required: [
       'id',
@@ -156,6 +160,7 @@ export const swaggerPlugin: any = async (
   });
   fastify.addSchema({
     $id: 'Offer',
+    title: 'Offer',
     type: 'object',
     required: ['id', 'email', 'phone'],
     properties: {
@@ -168,6 +173,7 @@ export const swaggerPlugin: any = async (
   });
   fastify.addSchema({
     $id: 'Task',
+    title: 'Task',
     type: 'object',
     required: ['id', 'name', 'userId', 'totalTime'],
     properties: {
@@ -185,6 +191,7 @@ export const swaggerPlugin: any = async (
   });
   fastify.addSchema({
     $id: 'Track',
+    title: 'Track',
     type: 'object',
     required: ['id', 'dateStart', 'limit'],
     properties: {
@@ -198,6 +205,7 @@ export const swaggerPlugin: any = async (
 
   fastify.addSchema({
     $id: 'Food',
+    title: 'Food',
     type: 'object',
     required: ['id', 'title', 'proteins', 'fats', 'carbohydrates'],
     properties: {
@@ -212,6 +220,7 @@ export const swaggerPlugin: any = async (
 
   fastify.addSchema({
     $id: 'UserProgram',
+    title: 'UserProgram',
     type: 'object',
     required: [
       'id',
@@ -225,6 +234,7 @@ export const swaggerPlugin: any = async (
       'ratioProteins',
       'ratioFats',
       'isExcludeActivity',
+      'isPersonalizedRatioSettings',
     ],
     properties: {
       id: { type: 'number' },
@@ -250,11 +260,13 @@ export const swaggerPlugin: any = async (
       ratioProteins: { type: 'number' },
       ratioFats: { type: 'number' },
       isExcludeActivity: { type: 'boolean' },
+      isPersonalizedRatioSettings: { type: 'boolean' },
     },
   });
 
   fastify.addSchema({
     $id: 'Dish',
+    title: 'Dish',
     type: 'object',
     required: ['id', 'title', 'status', 'createdAt', 'foods', 'user'],
     properties: {
@@ -301,6 +313,7 @@ export const swaggerPlugin: any = async (
 
   fastify.addSchema({
     $id: 'DishMealEntry',
+    title: 'DishMealEntry',
     type: 'object',
     required: [
       'id',
@@ -328,6 +341,7 @@ export const swaggerPlugin: any = async (
 
   fastify.addSchema({
     $id: 'FoodMealEntry',
+    title: 'FoodMealEntry',
     type: 'object',
     required: [
       'id',
@@ -350,6 +364,162 @@ export const swaggerPlugin: any = async (
         enum: [MealEntryType.food],
       },
       food: { $ref: 'Food' },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'UserActivityEntry',
+    title: 'UserActivityEntry',
+    type: 'object',
+    required: ['id', 'user', 'name', 'calories', 'createdAt'],
+    properties: {
+      id: { type: 'number' },
+      user: { $ref: 'SlimUser' },
+      calories: { type: 'number' },
+      name: { type: 'string' },
+      createdAt: { type: 'string' },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'BaseCurrencySetting',
+    title: 'BaseCurrencySetting',
+    type: 'object',
+    required: ['id', 'currencyCharCode'],
+    properties: {
+      id: { type: 'number' },
+      currencyCharCode: { type: 'string' },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'TransactionCategory',
+    title: 'TransactionCategory',
+    type: 'object',
+    required: ['id', 'title', 'color'],
+    properties: {
+      id: { type: 'number' },
+      title: { type: 'string' },
+      color: { type: 'string' },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'CoinTransaction',
+    title: 'CoinTransaction',
+    type: 'object',
+    required: [
+      'id',
+      'title',
+      'amount',
+      'type',
+      'currencyCharCode',
+      'date',
+      'createdAt',
+    ],
+    properties: {
+      id: { type: 'number' },
+      category: {
+        $ref: 'TransactionCategory',
+      },
+      title: { type: 'string' },
+      description: { type: 'string' },
+      amount: { type: 'number' },
+      type: {
+        type: 'string',
+        enum: [
+          CoinTransactionType.expense,
+          CoinTransactionType.income,
+          CoinTransactionType.transfer,
+        ],
+      },
+      currencyCharCode: {
+        type: 'string',
+      },
+      date: {
+        type: 'string',
+      },
+      createdAt: {
+        type: 'string',
+      },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'CoinPlannedTransaction',
+    title: 'CoinPlannedTransaction',
+    type: 'object',
+    required: [
+      'id',
+      'title',
+      'amount',
+      'type',
+      'status',
+      'currencyCharCode',
+      'createdAt',
+    ],
+    properties: {
+      id: { type: 'number' },
+      category: {
+        $ref: 'TransactionCategory',
+      },
+      title: { type: 'string' },
+      description: { type: 'string' },
+      amount: { type: 'number' },
+      type: {
+        type: 'string',
+        enum: [
+          CoinTransactionType.expense,
+          CoinTransactionType.income,
+          CoinTransactionType.transfer,
+        ],
+      },
+      plannedDate: { type: 'string' },
+      actualTransaction: {
+        $ref: 'CoinTransaction',
+      },
+      status: {
+        type: 'string',
+        enum: [
+          CoinPlannedTransactionStatusType.completed,
+          CoinPlannedTransactionStatusType.pending,
+          CoinPlannedTransactionStatusType.skipped,
+        ],
+      },
+      currencyCharCode: {
+        type: 'string',
+      },
+      createdAt: {
+        type: 'string',
+      },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'UserBalance',
+    title: 'UserBalance',
+    type: 'object',
+    required: ['currency', 'amount'],
+    properties: {
+      currency: { type: 'string' },
+      amount: { type: 'number' },
+      updatedAt: {
+        type: 'string',
+      },
+    },
+  });
+
+  fastify.addSchema({
+    $id: 'UserPlannedBalance',
+    title: 'UserPlannedBalance',
+    type: 'object',
+    required: ['currency', 'amount'],
+    properties: {
+      currency: { type: 'string' },
+      amount: { type: 'number' },
+      updatedAt: {
+        type: 'string',
+      },
     },
   });
 

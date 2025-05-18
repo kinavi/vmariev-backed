@@ -1,12 +1,12 @@
-import { server } from './';
+import { serverInstans } from './server';
 import { FastifyType } from './types';
 
 export function build(): FastifyType {
   beforeAll(async () => {
-    await server.fastify.ready();
+    await serverInstans.fastify.ready();
   });
 
-  afterAll(() => server.fastify.close());
+  afterAll(() => serverInstans.fastify.close());
 
-  return server.fastify as any;
+  return serverInstans.fastify as any;
 }

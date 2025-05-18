@@ -14,6 +14,14 @@ import UserProgram from './userProgram';
 import UserProgramMealEntry from './userProgramMealEntries';
 import Dish from './dish';
 import DishFoods from './dishFoods';
+import UserActivityEntries from './userActivityEntries';
+import CurrencyRubRate from './currencyRubRate';
+import BaseCurrencyUser from './baseCurrencyUser';
+import TransactionCategory from './transactionCategory';
+import CoinTransaction from './coinTransaction';
+import CoinPlannedTransaction from './coinPlannedTransaction';
+import UserBalance from './userBalance';
+import UserPlannedBalance from './userPlannedBalance';
 
 UserProgram.belongsTo(User, {
   as: 'user',
@@ -202,6 +210,57 @@ MealEntry.belongsTo(Dish, {
   as: 'dish',
 });
 
+UserActivityEntries.belongsTo(User, {
+  foreignKey: 'userId',
+  constraints: false,
+  as: 'user',
+});
+
+User.hasMany(UserActivityEntries, {
+  foreignKey: 'userId',
+  constraints: false,
+});
+
+BaseCurrencyUser.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+TransactionCategory.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+CoinTransaction.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+CoinTransaction.belongsTo(TransactionCategory, {
+  foreignKey: 'categoryId',
+  as: 'category',
+});
+
+CoinPlannedTransaction.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
+CoinPlannedTransaction.belongsTo(TransactionCategory, {
+  foreignKey: 'categoryId',
+  as: 'category',
+});
+
+CoinPlannedTransaction.belongsTo(CoinTransaction, {
+  foreignKey: 'actualTransactionId',
+  as: 'actualTransaction',
+});
+
+UserBalance.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
+});
+
 export {
   Offer,
   Order,
@@ -218,4 +277,12 @@ export {
   UserProgram,
   Dish,
   DishFoods,
+  UserActivityEntries,
+  CurrencyRubRate,
+  BaseCurrencyUser,
+  TransactionCategory,
+  CoinTransaction,
+  CoinPlannedTransaction,
+  UserBalance,
+  UserPlannedBalance,
 };

@@ -36,6 +36,7 @@ export interface UserProgramAttributes {
   ratioProteins: number;
   ratioFats: number;
   isExcludeActivity: boolean;
+  isPersonalizedRatioSettings: boolean;
 }
 
 class UserProgram
@@ -54,6 +55,7 @@ class UserProgram
   public ratioProteins!: number;
   public ratioFats!: number;
   public isExcludeActivity!: boolean;
+  public isPersonalizedRatioSettings!: boolean;
 
   public readonly updatedAt!: Date;
   public readonly createdAt!: Date;
@@ -82,6 +84,7 @@ UserProgram.init(
     ratioProteins: DataTypes.INTEGER,
     ratioFats: DataTypes.INTEGER,
     isExcludeActivity: DataTypes.BOOLEAN,
+    isPersonalizedRatioSettings: DataTypes.BOOLEAN,
   },
   {
     sequelize: connection,

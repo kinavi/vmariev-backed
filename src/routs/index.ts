@@ -10,6 +10,7 @@ import { adminRouts } from './admin';
 import { privateRouts } from './private';
 import { managerRouts } from './manager';
 import { gluttonRouts } from './glutton';
+import { coinsRouts } from './coins';
 
 export const routs: FastifyPluginCallback = async (
   fastify,
@@ -39,5 +40,6 @@ export const routs: FastifyPluginCallback = async (
   fastify.register(adminRouts, { prefix: '/admin' });
   fastify.register(managerRouts, { prefix: '/manager' });
   fastify.register(gluttonRouts, { prefix: '/glutton' });
+  fastify.register(coinsRouts, { prefix: '/coins' });
   fastify.register(privateRouts);
 };

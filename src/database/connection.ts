@@ -1,6 +1,10 @@
 import { Sequelize } from 'sequelize';
 
-require('dotenv').config();
+if (process.env.NODE_ENV === 'test') {
+  require('dotenv').config({ path: '.env.test' });
+} else {
+  require('dotenv').config();
+}
 
 if (!process.env.DB_NAME) {
   throw console.error('not has process.env.DB_NAME');
@@ -23,6 +27,7 @@ let sequelizeConnection: Sequelize = new Sequelize(
     host: process.env.DB_HOST,
     dialect: 'mysql',
     port: Number(process.env.DB_PORT),
+    logging: process.env.NODE_ENV !== 'test',
   }
 );
 

@@ -1,5 +1,5 @@
+import { upload } from '../../../server';
 import { FastifyType, ResponceType } from '../../../types';
-import { upload } from '../../../';
 
 declare module 'fastify' {
   interface FastifyRequest {

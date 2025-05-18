@@ -58,7 +58,7 @@ export class UsersController {
     if (!user) {
       throw {
         status: 'error',
-        message: 'Ошибка авторизации',
+        message: 'signInError',
       };
     }
 
@@ -81,7 +81,7 @@ export class UsersController {
     if (!MAX_AGE_REFRESH_TOKEN_SECONDS) {
       throw {
         status: 'error',
-        message: 'Ошибка авторизации',
+        message: 'signInError',
       };
     }
     const expiresAt = new Date(
@@ -138,14 +138,14 @@ export class UsersController {
     if (!user) {
       throw {
         status: 'error',
-        message: 'Ошибка авторизации',
+        message: 'signInError',
       };
     }
 
     if (!this.validateUser(user, password)) {
       throw {
         status: 'error',
-        message: 'Ошибка авторизации',
+        message: 'signInError',
       };
     }
 
@@ -168,7 +168,7 @@ export class UsersController {
     if (!MAX_AGE_REFRESH_TOKEN_SECONDS) {
       throw {
         status: 'error',
-        message: 'Ошибка авторизации',
+        message: 'signInError',
       };
     }
     const expiresAt = new Date(

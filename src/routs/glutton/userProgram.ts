@@ -23,6 +23,7 @@ export const userProgramsRoutes: any = async (
       ratioProteins: number;
       ratioFats: number;
       isExcludeActivity: boolean;
+      isPersonalizedRatioSettings: boolean;
     };
   }>(
     '/',
@@ -54,6 +55,7 @@ export const userProgramsRoutes: any = async (
             ratioProteins: { type: 'number' },
             ratioFats: { type: 'number' },
             isExcludeActivity: { type: 'boolean' },
+            isPersonalizedRatioSettings: { type: 'boolean' },
           },
           required: [
             'sex',
@@ -66,6 +68,7 @@ export const userProgramsRoutes: any = async (
             'weight',
             'height',
             'isExcludeActivity',
+            'isPersonalizedRatioSettings',
           ],
         },
         response: {
@@ -104,6 +107,7 @@ export const userProgramsRoutes: any = async (
           ratioFats,
           ratioProteins,
           isExcludeActivity,
+          isPersonalizedRatioSettings,
         },
       } = request;
       const userId = request.user?.id;
@@ -135,6 +139,7 @@ export const userProgramsRoutes: any = async (
         ratioFats,
         ratioProteins,
         isExcludeActivity,
+        isPersonalizedRatioSettings,
       });
 
       if (!program) {
