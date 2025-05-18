@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "allowJs": true,
     "allowUnreachableCode": false,
     "noFallthroughCasesInSwitch": true,
@@ -16,7 +17,6 @@
     "types": ["node", "jest"],
     "target": "es6",
     "outDir": "build",
-    "rootDir": "src/",  
     "sourceMap": true,                                /* Create source map files for emitted JavaScript files. */
     "removeComments": true,  
     "esModuleInterop": true,                             /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
@@ -25,7 +25,7 @@
     "skipLibCheck": true,                              /* Skip type checking all .d.ts files. */
     "typeRoots": ["./src/typings", "node_modules/@types"]
   },
-  "include": ["./**/*.ts", "src/routs/schema.js"],
+  "include": ["src/**/*", "src/routs/schema.js"],
   "exclude": ["node_modules", "build", "dist", "**/*.spec.ts", "**/*.test.ts", "**/tests/*", "src/helper.ts"]
 }
 

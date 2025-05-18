@@ -86,7 +86,7 @@ CoinTransaction.init(
     currencyCharCode: DataTypes.STRING,
     title: DataTypes.STRING,
     description: { type: DataTypes.STRING, allowNull: true },
-    amount: DataTypes.INTEGER,
+    amount: DataTypes.DECIMAL(10, 2),
     date: DataTypes.DATE,
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,

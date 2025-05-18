@@ -81,7 +81,7 @@ async function recalculateBalance(fastify: FastifyInstance) {
 
       const plannedBalance = UserPlannedBalance.build({
         currency: baseUserCurrencyModel.currencyCharCode,
-        amount: balance.amount,
+        amount: 0,
         userId: user.id,
       });
 

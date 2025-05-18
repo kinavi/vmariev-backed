@@ -93,7 +93,7 @@ CoinPlannedTransaction.init(
     ),
     title: DataTypes.STRING,
     description: { type: DataTypes.STRING, allowNull: true },
-    amount: DataTypes.INTEGER,
+    amount: DataTypes.DECIMAL(10, 2),
     plannedDate: { type: DataTypes.DATE, allowNull: true },
     actualTransactionId: {
       type: DataTypes.INTEGER,
