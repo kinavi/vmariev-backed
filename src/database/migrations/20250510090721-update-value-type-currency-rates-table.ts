@@ -8,18 +8,10 @@ module.exports = {
       type: Sequelize.DECIMAL(10, 3),
       allowNull: false,
     });
-    await queryInterface.changeColumn('CurrencyRubRates', 'nominal', {
-      type: Sequelize.DECIMAL(10, 6),
-      allowNull: false,
-    });
   },
 
   async down(queryInterface: QueryInterface, Sequelize: typeof DataTypes) {
     await queryInterface.changeColumn('CurrencyRubRates', 'value', {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-    });
-    await queryInterface.changeColumn('CurrencyRubRates', 'nominal', {
       type: Sequelize.INTEGER,
       allowNull: false,
     });
