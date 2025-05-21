@@ -19,7 +19,7 @@ export const createPlannedTransactionRout: any = async (
       amount: number;
       type: CoinTransactionType;
       currencyCharCode: string;
-      plannedDate?: string;
+      date?: string | null;
       status: CoinPlannedTransactionStatusType;
     };
   }>(
@@ -32,7 +32,7 @@ export const createPlannedTransactionRout: any = async (
           properties: {
             title: { type: 'string' },
             description: { type: 'string' },
-            categoryId: { type: 'number' },
+            categoryId: { type: 'number', nullable: true },
             amount: { type: 'number' },
             type: {
               type: 'string',
@@ -43,7 +43,7 @@ export const createPlannedTransactionRout: any = async (
               ],
             },
             currencyCharCode: { type: 'string' },
-            plannedDate: { type: 'string' },
+            date: { type: 'string', nullable: true },
             status: {
               type: 'string',
               enum: [
@@ -86,7 +86,7 @@ export const createPlannedTransactionRout: any = async (
         title,
         type,
         currencyCharCode,
-        plannedDate,
+        date,
         status,
       } = request.body;
       const userId = request.user?.id;
@@ -97,14 +97,13 @@ export const createPlannedTransactionRout: any = async (
 
       const transactionModel = await CoinPlannedTransaction.build({
         amount,
-        categoryId,
+        categoryId: categoryId !== undefined ? categoryId : null,
         description,
         title,
         type,
         userId,
         currencyCharCode,
-        plannedDate:
-          plannedDate !== undefined ? new Date(plannedDate) : undefined,
+        date: date ? new Date(date) : null,
         status,
       });
 

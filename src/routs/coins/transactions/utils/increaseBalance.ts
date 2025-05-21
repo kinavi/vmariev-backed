@@ -49,9 +49,11 @@ async function increaseBalance(
   });
 
   currentBalanse.currency = baseCurrencyCurrentUser.currencyCharCode;
-  currentBalanse.amount =
-    +_convertedBalaceAmountByCurrentBaseCurrency + _convertedTransactionAmount;
-
+  const updatedAmount =
+    Number(_convertedBalaceAmountByCurrentBaseCurrency) +
+    Number(_convertedTransactionAmount);
+  currentBalanse.amount = updatedAmount;
+  
   await currentBalanse.save();
 
   return currentBalanse;

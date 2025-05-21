@@ -28,7 +28,7 @@ export const createTransactionRout: any = async (fastify: FastifyType) => {
           properties: {
             title: { type: 'string' },
             description: { type: 'string' },
-            categoryId: { type: 'number' },
+            categoryId: { type: 'number', nullable: true },
             amount: { type: 'number' },
             type: {
               type: 'string',
@@ -41,7 +41,7 @@ export const createTransactionRout: any = async (fastify: FastifyType) => {
             currencyCharCode: { type: 'string' },
             date: { type: 'string' },
           },
-          required: ['title', 'amount', 'type', 'currencyCharCode'],
+          required: ['title', 'amount', 'type', 'currencyCharCode', 'date'],
         },
         response: {
           200: {

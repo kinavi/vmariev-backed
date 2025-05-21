@@ -474,7 +474,10 @@ export const swaggerPlugin: any = async (
           CoinTransactionType.transfer,
         ],
       },
-      plannedDate: { type: 'string' },
+      date: {
+        type: 'string',
+        nullable: true,
+      },
       actualTransaction: {
         $ref: 'CoinTransaction',
       },

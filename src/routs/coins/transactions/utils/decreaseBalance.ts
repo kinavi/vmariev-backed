@@ -8,7 +8,6 @@ import { FastifyType } from '../../../../types';
 import { convertCurrency } from './convertCurrency';
 import { getBaseCurrencyCurrentUserModel } from './getBaseCurrencyCurrentUser';
 import { getCurrencyRatesByCurrentDay } from './getCurrencyRatesByCurrentDay';
-import { getUserBalanceModel } from './getUserBalance';
 
 async function decreaseBalance(
   fastify: FastifyType,
@@ -51,8 +50,10 @@ async function decreaseBalance(
 
   currentBalanse.currency = baseCurrencyCurrentUser.currencyCharCode;
   const updatedAmount =
-    _convertedBalaceAmountByCurrentBaseCurrency - _convertedTransactionAmount;
-    currentBalanse.amount = updatedAmount >= 0 ? updatedAmount : 0;
+    Number(_convertedBalaceAmountByCurrentBaseCurrency) -
+    Number(_convertedTransactionAmount);
+
+  currentBalanse.amount = updatedAmount;
 
   await currentBalanse.save();
 

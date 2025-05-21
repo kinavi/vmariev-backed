@@ -1,5 +1,5 @@
 import { NO_ACCESS_CODE_ERROR } from '../../../constants';
-import { CoinTransaction } from '../../../database/models';
+import { CoinTransaction, TransactionCategory } from '../../../database/models';
 import { FastifyType, ResponceType, ResponseErrorType } from '../../../types';
 
 export const getTransactionRout: any = async (fastify: FastifyType) => {
@@ -42,6 +42,12 @@ export const getTransactionRout: any = async (fastify: FastifyType) => {
           id,
           userId,
         },
+        include: [
+          {
+            model: TransactionCategory,
+            as: 'category',
+          },
+        ],
       });
 
       if (!transaction) {

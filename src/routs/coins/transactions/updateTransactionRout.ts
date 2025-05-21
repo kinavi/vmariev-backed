@@ -17,6 +17,7 @@ export const updateTransactionRout: any = async (fastify: FastifyType) => {
       amount: number;
       type: CoinTransactionType;
       currencyCharCode: string;
+      date: string;
     };
     Params: { id: string };
   }>(
@@ -47,8 +48,9 @@ export const updateTransactionRout: any = async (fastify: FastifyType) => {
               ],
             },
             currencyCharCode: { type: 'string' },
+            date: { type: 'string' },
           },
-          required: ['title', 'amount', 'type', 'currencyCharCode'],
+          required: ['title', 'amount', 'type', 'currencyCharCode', 'date'],
         },
         response: {
           200: {
@@ -83,6 +85,7 @@ export const updateTransactionRout: any = async (fastify: FastifyType) => {
           title,
           type,
           currencyCharCode,
+          date,
         },
       } = request;
       const userId = request.user?.id;
@@ -141,6 +144,7 @@ export const updateTransactionRout: any = async (fastify: FastifyType) => {
       transactionModel.title = title;
       transactionModel.type = type;
       transactionModel.currencyCharCode = currencyCharCode;
+      transactionModel.date = new Date(date);
 
       switch (transactionModel.type) {
         case CoinTransactionType.expense:
@@ -166,6 +170,7 @@ export const updateTransactionRout: any = async (fastify: FastifyType) => {
           break;
       }
 
+      await userBalance.save();
       await transactionModel.save();
       const responce: ResponceType = {
         status: 'ok',

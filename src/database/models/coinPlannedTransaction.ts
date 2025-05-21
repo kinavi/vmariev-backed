@@ -13,12 +13,12 @@ export enum CoinPlannedTransactionStatusType {
 export interface CoinPlannedTransactionAttributes {
   id: number;
   userId: number;
-  categoryId?: number;
+  categoryId?: number | null;
   title: string;
   description?: string;
   amount: number;
   type: CoinTransactionType;
-  plannedDate?: Date;
+  date?: Date;
   currencyCharCode: string;
 
   actualTransactionId?: number;
@@ -30,12 +30,12 @@ export interface CoinPlannedTransactionAttributes {
 
 export interface CreateCoinPlannedTransactionAttributes {
   userId: number;
-  categoryId?: number;
+  categoryId?: number | null;
   title: string;
   description?: string;
   amount: number;
   type: CoinTransactionType;
-  plannedDate?: Date;
+  date?: Date | null;
   currencyCharCode: string;
 
   actualTransactionId?: number;
@@ -49,14 +49,14 @@ class CoinPlannedTransaction extends Model<
   declare id: number;
 
   declare userId: ForeignKey<User['id']>;
-  declare categoryId?: ForeignKey<TransactionCategory['id']>;
+  declare categoryId?: ForeignKey<TransactionCategory['id']> | null;
   declare actualTransactionId?: ForeignKey<CoinTransaction['id']>;
 
   declare title: string;
   declare description?: string;
   declare amount: number;
   declare type: CoinTransactionType;
-  declare plannedDate?: Date;
+  declare date?: Date | null;
   declare status: CoinPlannedTransactionStatusType;
   declare currencyCharCode: string;
 
@@ -94,7 +94,7 @@ CoinPlannedTransaction.init(
     title: DataTypes.STRING,
     description: { type: DataTypes.STRING, allowNull: true },
     amount: DataTypes.DECIMAL(10, 2),
-    plannedDate: { type: DataTypes.DATE, allowNull: true },
+    date: { type: DataTypes.DATE, allowNull: true },
     actualTransactionId: {
       type: DataTypes.INTEGER,
       references: {

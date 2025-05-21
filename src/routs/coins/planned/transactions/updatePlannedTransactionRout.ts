@@ -18,14 +18,14 @@ export const updatePlannedTransactionRout: any = async (
   fastify.put<{
     Body: {
       id: number;
-      categoryId?: number;
+      categoryId?: number | null;
       title: string;
       description?: string;
       amount: number;
       type: CoinTransactionType;
       currencyCharCode: string;
 
-      plannedDate?: string;
+      date?: string | null;
       status: CoinPlannedTransactionStatusType;
     };
     Params: { id: string };
@@ -46,7 +46,7 @@ export const updatePlannedTransactionRout: any = async (
           properties: {
             title: { type: 'string' },
             description: { type: 'string' },
-            categoryId: { type: 'number' },
+            categoryId: { type: 'number', nullable: true },
             amount: { type: 'number' },
             type: {
               type: 'string',
@@ -57,7 +57,7 @@ export const updatePlannedTransactionRout: any = async (
               ],
             },
             currencyCharCode: { type: 'string' },
-            plannedDate: { type: 'string' },
+            date: { type: 'string', nullable: true },
             status: {
               type: 'string',
               enum: [
@@ -102,6 +102,7 @@ export const updatePlannedTransactionRout: any = async (
           title,
           type,
           currencyCharCode,
+          date = null,
         },
       } = request;
       const userId = request.user?.id;
@@ -160,6 +161,7 @@ export const updatePlannedTransactionRout: any = async (
       transactionModel.title = title;
       transactionModel.type = type;
       transactionModel.currencyCharCode = currencyCharCode;
+      transactionModel.date = (date && new Date(date)) || null;
 
       switch (transactionModel.type) {
         case CoinTransactionType.expense:
